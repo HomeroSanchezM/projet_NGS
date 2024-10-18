@@ -1,13 +1,8 @@
 import os, sys
 
 sam = sys.argv[1]
+file = open(sam, 'r')
+for ligne in file :
+    print(ligne, end="")
+file.close()
 
-for ligne in sam :
-print(ligne, end="")
-<<<<<<< HEAD
-sam.close()
-#=======
-
-# Test Ouverture et dépot sur git Micka 
-
->>>>>>> ae05d33644290377583192483cff3d8abca453b4
