@@ -6,8 +6,7 @@ for ligne in sam :
 print(ligne, end="")
 <<<<<<< HEAD
 sam.close()
-=======
-fd.close()
+#=======
 
 # Test Ouverture et dépot sur git Micka 
 
