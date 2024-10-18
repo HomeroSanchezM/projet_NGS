@@ -1,4 +1,5 @@
-import sys
+import sys #pour donner des parametres lors de l'appel de la fonction sur le terminal ou dans un .sh
+import pandas as pd #pour faire des tableau
 
 #La fonction liste_flags prend en entrée une chaîne de caractères 
 #correspondant au chemin d'un fichier SAM et retourne une liste contenant
@@ -31,4 +32,11 @@ def Dico_flags(l_flags):
             d_flags[i_flag] = 1 #si la clé n'existe pas on la crée et on lui donne la valeur 1
     return d_flags
 
-print(Dico_flags(liste_flags(sys.argv[1])))
+print(Dico_flags(liste_flags(sys.argv[1]))) #afficher le dictionnaire
+
+#création d'un tableau avec le dictionnaire retourner par Dico_flags
+d_flags =Dico_flags(liste_flags(sys.argv[1]))
+#Créer un DataFrame à partir du dictionnaire
+t_flags = pd.DataFrame(list(d_flags.items()), columns=['Flag', 'nb de fois présent'])
+#Afficher le tableau
+print(t_flags)
