@@ -1,6 +1,7 @@
 import os, sys
 
-sam = open(<chemin/nomFichier>, "r")
-for ligne in fd :
+sam = sys.argv[1]
+
+for ligne in sam :
 print(ligne, end="")
-fd.close()
+sam.close()
