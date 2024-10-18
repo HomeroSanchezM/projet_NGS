@@ -6,13 +6,29 @@ import sys
 
 def liste_flags(ficher_sam):
     file = open(ficher_sam, 'r') #ouverture en mode lecture
-    flags = [] #creation de liste vide pour contenir les flags
-    for ligne in file :
-        if ligne[0]!="@*": #verifie que la ligne ne commence pas par @
-            colonnes = ligne.split()  #colonne correspont a une liste des element de chaque ligne qui etait separée par des tabulation
-            flags.append(colonnes[1]) #on ajoute a la liste flag la valeur de la deuxieme colonne de chaque ligne
-    file.close()
-    return flags
+    l_flags = [] #creation de liste vide pour contenir les flags
+    for i_ligne in file :
+        if i_ligne[0]!="@*": #verifie que la ligne ne commence pas par @
+            l_colonnes = i_ligne.split()  #colonne correspont a une liste des element de chaque ligne qui etait separée par des tabulation
+            l_flags.append(l_colonnes[1]) #on ajoute a la liste flag la valeur de la deuxieme colonne de chaque ligne
+    file.close()#on referme le fichier SAM
+    return l_flags
 
  
-print(liste_flags(sys.argv[1]))#Prend le chemin du chemin du fichier sam donne en parametre
+#print(liste_flags(sys.argv[1]))#Prend le chemin du chemin du fichier sam donne en parametre
+
+
+#La fonction Dico_flags prend en entrée une liste de flags et
+#retourne un dictionnaire avec comme clés les flags et comme 
+#valeurs le nombre de fois que chaque flag est présent dans la liste.
+
+def Dico_flags(l_flags):
+    d_flags = {} #creation d'un dictionnaire vide
+    for i_flag in l_flags:
+        if i_flag in d_flags: #verifie si une clé est déja dans le dictionnaire
+            d_flags[i_flag] += 1 #si elle exite deja, on l'incremente de 1
+        else:
+            d_flags[i_flag] = 1 #si la clé n'existe pas on la crée et on lui donne la valeur 1
+    return d_flags
+
+print(Dico_flags(liste_flags(sys.argv[1])))
