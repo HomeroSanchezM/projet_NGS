@@ -9,7 +9,7 @@ def liste_flags(ficher_sam):
     file = open(ficher_sam, 'r') #ouverture en mode lecture
     l_flags = [] #creation de liste vide pour contenir les flags
     for i_ligne in file :
-        if i_ligne[0]!="@*": #verifie que la ligne ne commence pas par @
+        if i_ligne[0]!="@": #verifie que la ligne ne commence pas par @
             l_colonnes = i_ligne.split()  #colonne correspont a une liste des element de chaque ligne qui etait separée par des tabulation
             l_flags.append(l_colonnes[1]) #on ajoute a la liste flag la valeur de la deuxieme colonne de chaque ligne
     file.close()#on referme le fichier SAM
