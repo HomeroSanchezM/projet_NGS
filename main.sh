@@ -13,12 +13,12 @@
 # Contrôles des conformités sur l'input #
 #-------------------------------------- #
 
-Rep="" # J'initialise mon Rep à null dans l'hypothèse ou la conjonction de mes vérifications renverrait false.
+Rep="" # J'initialise mon Rep à null dans l'hypothèse où la conjonction de mes vérifications renverrait false.
 
 # Vérification des conditions en une seule instruction if
 if [ -z "$1" ] || [ ! -f "$1" ] || [ -d "$1" ] || [ ! -s "$1" ]; then
 
-    # Montage du texte d'erreur dans l'hypothèse ou au moins une de nos opérandes est fausse :
+    # Montage du texte d'erreur dans l'hypothèse où au moins une de nos opérandes est fausse :
     [ -z "$1" ]   &&  Rep+="Erreur: Aucun fichier SAM spécifié.\n"
     [ ! -f "$1" ] &&  Rep+="Erreur: Le fichier n'existe pas.\n"
     [ -d "$1" ]   &&  Rep+="Erreur: Le fichier est un répertoire.\n"
@@ -28,11 +28,19 @@ if [ -z "$1" ] || [ ! -f "$1" ] || [ -d "$1" ] || [ ! -s "$1" ]; then
     echo -e "Erreur(s) détectée(s) :\n$Rep"
     exit 1
 else
-    # Si toutes les conditions sont satisfaites, on execute notre Script Python et ca bombarde ;) ...
-    echo "Nos controles préliminaires sont terminés, élaboration du rapport en cours ..."
+    # Si toutes les conditions sont satisfaites, on exécute notre Script Python
+
+    debNGSpy=$(date +%s) # Correction : espace ajouté après `date`
+
+    echo "Nos contrôles préliminaires sont terminés, élaboration du rapport : "
     
+    # On lance NGS.py sur notre premier paramètre
     python3 NGS.py "$1"
     
+    endNGSpy=$(date +%s) # Correction : espace ajouté après `date`
+    
+    # Affichage du temps de traitement
+    echo -e "\nTemps de traitement : $((endNGSpy - debNGSpy)) secondes"
+    
 fi
-
 
