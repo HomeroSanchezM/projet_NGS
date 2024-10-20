@@ -4,10 +4,9 @@
 #                                                                          COQUERELLE MICKAEL - HOMERO SANCHEZ 18.10.2024                                                                                #      
 #			        		               --  SCORE : SAM Characterization and Observational Report for Evaluations  --                                                              
 ###########################################################################################################################################################################################################
+sep="--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
 
-# CONVENTIONS - NOMENCLATURE :
-# on choisit dans nos regles de nommages d'identifier chaque variable avec comme première lettre son type de donnée pour stocker l'information le long du script et se répérer.
-# bBooleen, dDictionnaire, sString, cCharact, iInteger, fFloat ...
+Script1="NGS.py"
 
 #-------------------------------------- #
 # Contrôles des conformités sur l'input #
@@ -31,14 +30,31 @@ else
     # Si toutes les conditions sont satisfaites, on exécute notre Script Python
 
     debNGSpy=$(date +%s) 
-    echo "Nos contrôles préliminaires sont terminés, élaboration du rapport : "
+   
+    echo -e "\nNos contrôles préliminaires sont terminés, création du rapport de sortie au format csv ... \n"
+
+#-------------------------------------- #
+# Génération de l'output au format .csv #
+#-------------------------------------- #
+  
+    # Créer le fichier output.csv avec la première ligne d'en-tête
+    echo "SCORE -- OUTPUT" > output.csv
+    echo "FLAG_REPERE,NOMBRE_OCCURENCES,TRANSLATE_FLAG" >> output.csv
+    echo "$sep"
     
-    # On lance NGS.py sur notre premier paramètre
-    python3 NGS.py "$1"
+    # On lance NGS.py  pour repérer les FLAGS présents et compter leurs occurences.
+    python3 "$Script1" "$1"
     
-    endNGSpy=$(date +%s) 
+    if [ $? -ne 0 ]; then #Si le code de retour de la dernière commande n'est pas égale à 0 
+    echo "Erreur lors de l'extraction des flags et du comptage des occurences, vérifier le script_1 ou si le nom du fichier n'est pas modifié."
+    exit 1
+    else 
+    echo -e "\nExtractions des Flags et comptages des occurences effectués avec succès\n"
+    fi
     
+    echo -e "\n$sep"
     # Affichage du temps de traitement
+    endNGSpy=$(date +%s) 
     echo -e "\nTemps de traitement : $((endNGSpy - debNGSpy)) secondes"
     
 fi
