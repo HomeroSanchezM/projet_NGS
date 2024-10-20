@@ -1,6 +1,9 @@
 import sys #pour donner des parametres lors de l'appel de la fonction sur le terminal ou dans un .sh
 import pandas as pd #pour faire des tableau
 
+####################
+#HOMERO 18/10/2024#
+####################
 #La fonction liste_flags prend en entrée une chaîne de caractères 
 #correspondant au chemin d'un fichier SAM et retourne une liste contenant
 #l'ensemble des flags du fichier
@@ -10,7 +13,7 @@ def liste_flags(ficher_sam):
     l_flags = [] #creation de liste vide pour contenir les flags
     for i_ligne in file :
         if i_ligne[0]!="@": #verifie que la ligne ne commence pas par @
-            l_colonnes = i_ligne.split()  #colonne correspont a une liste des element de chaque ligne qui etait separée par des tabulation
+            l_colonnes = i_ligne.split()  #colonne correspond a une liste des element de chaque ligne qui etait separée par des tabulation
             l_flags.append(l_colonnes[1]) #on ajoute a la liste flag la valeur de la deuxieme colonne de chaque ligne
     file.close()#on referme le fichier SAM
     return l_flags
@@ -32,11 +35,19 @@ def Dico_flags(l_flags):
             d_flags[i_flag] = 1 #si la clé n'existe pas on la crée et on lui donne la valeur 1
     return d_flags
 
-print(Dico_flags(liste_flags(sys.argv[1]))) #afficher le dictionnaire
+print(Dico_flags(liste_flags(sys.argv[1]))) # afficher le dictionnaire 
 
-#création d'un tableau avec le dictionnaire retourner par Dico_flags
+
+###################
+#MICKAEL 19/10/2024
+###################
+
+#On va élaborer un dictionnaire de correspondances des flags établir une correspondance pour pouvoir 
+
+#création d'un tableau avec le dictionnaire retourner par Di	co_flags
 d_flags =Dico_flags(liste_flags(sys.argv[1]))
 #Créer un DataFrame à partir du dictionnaire
 t_flags = pd.DataFrame(list(d_flags.items()), columns=['Flag', 'nb de fois présent'])
 #Afficher le tableau
 print(t_flags)
+

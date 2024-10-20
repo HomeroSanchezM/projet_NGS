@@ -30,14 +30,13 @@ if [ -z "$1" ] || [ ! -f "$1" ] || [ -d "$1" ] || [ ! -s "$1" ]; then
 else
     # Si toutes les conditions sont satisfaites, on exécute notre Script Python
 
-    debNGSpy=$(date +%s) # Correction : espace ajouté après `date`
-
+    debNGSpy=$(date +%s) 
     echo "Nos contrôles préliminaires sont terminés, élaboration du rapport : "
     
     # On lance NGS.py sur notre premier paramètre
     python3 NGS.py "$1"
     
-    endNGSpy=$(date +%s) # Correction : espace ajouté après `date`
+    endNGSpy=$(date +%s) 
     
     # Affichage du temps de traitement
     echo -e "\nTemps de traitement : $((endNGSpy - debNGSpy)) secondes"
