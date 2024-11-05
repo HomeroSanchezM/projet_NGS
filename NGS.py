@@ -74,21 +74,32 @@ def dico_extraction1(fichier_sam):
 
 def analyse_CIGAR(d_sam):
     # Initialiser un dictionnaire pour compter les opérations CIGAR
-    comptes_CIGAR = {op: 0 for op in 'MIDNSHP=X*'}
+    comptes_CIGAR = {
+    'M': 0,  # Match (alignement de base)
+    'I': 0,  # Insertion (délétion dans la séquence de référence)
+    'D': 0,  # Deletion (insertion dans la séquence cible)
+    'N': 0,  # Skipping (indication de l'existence d'un intron)
+    'S': 0,  # Soft clipping (bases coupées mais conservées dans le fichier SAM)
+    'H': 0,  # Hard clipping (bases coupées et non enregistrées)
+    'P': 0,  # Padding (espaces réservés dans l'alignement)
+    '=': 0,  # Identique (opérations qui correspondent aux bases de la séquence)
+    'X': 0,  # Mismatch (mismatch entre les bases d'alignement)
+    '*': 0   # Opérations non spécifiées ou indéfinies
+}
 
     # Parcourir chaque lecture dans le dictionnaire d_sam
     for read in d_sam.values():
-        CIGAR_d_sam = read["CIGAR"]  # Extraire le CIGAR de la lecture
+        CIGAR_d_sam = read["CIGAR"]  # Extraire le CIGAR du dico sam
 
         iCig = 0  # Initialiser l'indice de la chaîne CIGAR
         while iCig < len(CIGAR_d_sam):
-            # Trouver la taille de l'opération
+            # Trouver la taille de l'opération CIGAR
             jCig = iCig
             while jCig < len(CIGAR_d_sam) and CIGAR_d_sam[jCig].isdigit():
                 jCig += 1
             
             taille_str = CIGAR_d_sam[iCig:jCig]  # Extraire la taille
-
+            
             if not taille_str:  # Si la taille est vide
                 iCig = jCig + 1  # Passer à l'élément suivant pour éviter une boucle infinie
                 continue  # Passer à la prochaine itération du while principal
@@ -102,15 +113,28 @@ def analyse_CIGAR(d_sam):
 
             operation = CIGAR_d_sam[jCig]  # Extraire l'opération
 
-            comptes_CIGAR[operation] += taille  # Incrémenter le compte de l'opération
+            comptes_CIGAR[operation] += taille  # Somme des comptes pour l'élément courant cigar
 
             # Passer à l'élément suivant du CIGAR
             iCig = jCig + 1
 
+   
     # Calculer le total des opérations et les pourcentages en une seule étape
     total_operations = sum(comptes_CIGAR.values())
-    pourcentages_CIGAR = {op: (compte / total_operations * 100) if total_operations > 0 else 0
-                          for op, compte in comptes_CIGAR.items()}
+    # Initialisation du dictionnaire des pourcentages
+    pourcentages_CIGAR = {
+    'M': (comptes_CIGAR['M'] / total_operations * 100) if total_operations > 0 else 0,  # Match
+    'I': (comptes_CIGAR['I'] / total_operations * 100) if total_operations > 0 else 0,  # Insertion
+    'D': (comptes_CIGAR['D'] / total_operations * 100) if total_operations > 0 else 0,  # Deletion
+    'N': (comptes_CIGAR['N'] / total_operations * 100) if total_operations > 0 else 0,  # Skipping
+    'S': (comptes_CIGAR['S'] / total_operations * 100) if total_operations > 0 else 0,  # Soft clipping
+    'H': (comptes_CIGAR['H'] / total_operations * 100) if total_operations > 0 else 0,  # Hard clipping
+    'P': (comptes_CIGAR['P'] / total_operations * 100) if total_operations > 0 else 0,  # Padding
+    '=': (comptes_CIGAR['='] / total_operations * 100) if total_operations > 0 else 0,  # Identique
+    'X': (comptes_CIGAR['X'] / total_operations * 100) if total_operations > 0 else 0,  # Mismatch
+    '*': (comptes_CIGAR['*'] / total_operations * 100) if total_operations > 0 else 0   # Opérations non spécifiées
+}
+
 
     # Afficher les résultats
     for operation, pourcentage in pourcentages_CIGAR.items():
