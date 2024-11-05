@@ -29,17 +29,18 @@ import pandas as pd #pour faire des tableau
 #    # etc.
 #}
 
+fichier_sam = sys.argv[1]
 
 #La fonction dico_extraction1 prend en entrée une chaîne de caractères 
 #correspondant au chemin d'un fichier SAM et retourne une dico de la forme du DICOEXTRACTION1
-def dico_extraction1(ficher_sam):
-    file = open(ficher_sam, 'r') #ouverture en mode lecture
+def dico_extraction1(fichier_sam):
+    file = open(fichier_sam, 'r') #ouverture en mode lecture
     d_sam = {} #creation du dico vide pour contenir les info des reads
     for i_ligne in file :
         if i_ligne[0]!="@": #verifie que la ligne ne commence pas par @
-            l_colonnes = i_ligne.split()  #colonne correspond a une liste des element de chaque ligne qui etait separée par des tabulation
+            l_colonnes = i_ligne.split()  #colonne correspond a une liste des elements de chaque ligne qui etait separée par des tabulations (découpe la ligne en colonnes)
             # Extraire les champs du fichier SAM
-            QNAME = l_colonnes[0]
+            QNAME = l_colonnes[0]  
             FLAG = l_colonnes[1]
             RNAME = l_colonnes[2]
             POS = l_colonnes[3]
@@ -64,8 +65,62 @@ def dico_extraction1(ficher_sam):
     file.close()#on referme le fichier SAM
     return d_sam
 
-#print(dico_extraction(sys.argv[1])) #decomenter pour tester
 
+#print(dico_extraction1(sys.argv[1])) #decommenter pour tester
+
+#################
+#Mickael 06/11/24
+#################
+
+def analyse_CIGAR(d_sam):
+    # Initialiser un dictionnaire pour compter les opérations CIGAR
+    comptes_CIGAR = {op: 0 for op in 'MIDNSHP=X*'}
+
+    # Parcourir chaque lecture dans le dictionnaire d_sam
+    for read in d_sam.values():
+        CIGAR_d_sam = read["CIGAR"]  # Extraire le CIGAR de la lecture
+
+        iCig = 0  # Initialiser l'indice de la chaîne CIGAR
+        while iCig < len(CIGAR_d_sam):
+            # Trouver la taille de l'opération
+            jCig = iCig
+            while jCig < len(CIGAR_d_sam) and CIGAR_d_sam[jCig].isdigit():
+                jCig += 1
+            
+            taille_str = CIGAR_d_sam[iCig:jCig]  # Extraire la taille
+
+            if not taille_str:  # Si la taille est vide
+                iCig = jCig + 1  # Passer à l'élément suivant pour éviter une boucle infinie
+                continue  # Passer à la prochaine itération du while principal
+
+            # Vérifier si la taille est un nombre entier valide
+            if taille_str.isdigit():
+                taille = int(taille_str)  # Convertir la taille en entier
+            else:
+                iCig = jCig + 1  # Passer à l'élément suivant si ce n'est pas un nombre valide
+                continue
+
+            operation = CIGAR_d_sam[jCig]  # Extraire l'opération
+
+            comptes_CIGAR[operation] += taille  # Incrémenter le compte de l'opération
+
+            # Passer à l'élément suivant du CIGAR
+            iCig = jCig + 1
+
+    # Calculer le total des opérations et les pourcentages en une seule étape
+    total_operations = sum(comptes_CIGAR.values())
+    pourcentages_CIGAR = {op: (compte / total_operations * 100) if total_operations > 0 else 0
+                          for op, compte in comptes_CIGAR.items()}
+
+    # Afficher les résultats
+    for operation, pourcentage in pourcentages_CIGAR.items():
+        print(f"{operation}: {pourcentage:.3f}%")
+    print(f"\nTotal des opérations : {total_operations}")
+
+    #return comptes_CIGAR, pourcentages_CIGAR, total_operations
+
+# Exemple d'appel
+print(analyse_CIGAR(dico_extraction1(fichier_sam)))
 
 
 #DICOEXTRACTION2
@@ -213,7 +268,7 @@ def decodage_flags(valeur_du_flag):
 
     # Chaque bit représente un flag spécifique et son commentaire associé
     for i_bit, s_commentaire in d_Binary_sam.items():
-        if valeur_du_flag & i_bit : # En gros ici on vérification l'activation ou non de chaque bit pour la valeur du flag
+        if valeur_du_flag & i_bit : # En gros ici on vérifie l'activation ou non de chaque bit pour la valeur du flag
             l_synthese.append(f"- {s_commentaire}")
 
     return "\n".join(l_synthese)
@@ -232,7 +287,7 @@ d_flags =Dico_flags(liste_flags(sys.argv[1]))
 #ajout a ce dictionnaire les commmentaire de decodate_flags
 
 for i_flag in d_flags:
-    l_decodage = decodage_flags(int(i_flag)) #création d'une liste avec les commentaire correspondant a chaque flag 
+    l_decodage = decodage_flags(int(i_flag)) #création d'une liste avec les commentaires correspondant a chaque flag 
     i_nb_fois_present = d_flags[i_flag] #recupere la valeur du nombre de flag present associe a chaque flag 
     d_flags[i_flag] = [i_nb_fois_present, l_decodage ] #associe a chaque flag une liste avec le nombre de fois que le flag est present et une liste avec les commentaires correspondant au flag
 
