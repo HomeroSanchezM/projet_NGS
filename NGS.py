@@ -117,8 +117,7 @@ def dico_extraction2(ficher_sam):
             RNEXT = l_colonnes[6]
             PNEXT = l_colonnes[7]
             TLEN = l_colonnes[8]
-            SEQ = l_colonnes[9]
-            QUAL = l_colonnes[10]
+            
 
             # Ajouter les informations dans le dictionnaire principal
             d_sam["FLAG"][QNAME] = FLAG
