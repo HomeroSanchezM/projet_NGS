@@ -2,7 +2,142 @@ import sys #pour donner des parametres lors de l'appel de la fonction sur le ter
 import pandas as pd #pour faire des tableau
 
 ####################
-#HOMERO 18/10/2024#
+#HOMERO 5/11/2024
+####################
+
+#format du dictionnaire d'extraction:
+
+#DICOEXTRACTION1
+#{
+#    "QNAME1": {
+#        "FLAG": FLAG1,
+#        "RNAME": RNAME1,
+#        "POS": POS1,
+#        "MAPQ": MAPQ1,
+#        "CIGAR": CIGAR1,
+#        "RNEXT": RNEXT1,
+#        "PNEXT": PNEXT1,
+#        "TLEN": TLEN1,
+#        "SEQ": SEQ1,
+#        "QUAL": QUAL1
+#    },
+#    "QNAME2": {
+#        "FLAG": FLAG2,
+#        "RNAME": RNAME2,
+#        # etc.
+#    },
+#    # etc.
+#}
+
+
+#La fonction dico_extraction1 prend en entrée une chaîne de caractères 
+#correspondant au chemin d'un fichier SAM et retourne une dico de la forme du DICOEXTRACTION1
+def dico_extraction1(ficher_sam):
+    file = open(ficher_sam, 'r') #ouverture en mode lecture
+    d_sam = {} #creation du dico vide pour contenir les info des reads
+    for i_ligne in file :
+        if i_ligne[0]!="@": #verifie que la ligne ne commence pas par @
+            l_colonnes = i_ligne.split()  #colonne correspond a une liste des element de chaque ligne qui etait separée par des tabulation
+            # Extraire les champs du fichier SAM
+            QNAME = l_colonnes[0]
+            FLAG = l_colonnes[1]
+            RNAME = l_colonnes[2]
+            POS = l_colonnes[3]
+            MAPQ = l_colonnes[4]
+            CIGAR = l_colonnes[5]
+            RNEXT = l_colonnes[6]
+            PNEXT = l_colonnes[7]
+            TLEN = l_colonnes[8]
+
+            # Ajouter les informations dans le dictionnaire
+            d_sam[QNAME] = {
+                "FLAG": FLAG,
+                "RNAME": RNAME,
+                "POS": POS,
+                "MAPQ": MAPQ,
+                "CIGAR": CIGAR,
+                "RNEXT": RNEXT,
+                "PNEXT": PNEXT,
+                "TLEN": TLEN,
+            }
+            
+    file.close()#on referme le fichier SAM
+    return d_sam
+
+#print(dico_extraction(sys.argv[1])) #decomenter pour tester
+
+
+
+#DICOEXTRACTION2
+#{
+#    "FLAG": {
+#        "QNAME1": FLAG1,
+#        "QNAME2": FLAG2,
+#        "QNAME3": FLAG3,
+#        "QNAME4": FLAG4,
+#        "QNAME5": FLAG5,
+#        "QNAME6": FLAG6,
+#         ect.
+#    },
+#    "RNAME": {
+#        "QNAME1": RNAME1,
+#        "QNAME2": RNAME2,
+#         etc.
+#    },
+#      etc.
+#}
+
+
+#La fonction dico_extraction1 prend en entrée une chaîne de caractères 
+#correspondant au chemin d'un fichier SAM et retourne une dico de la forme du DICOEXTRACTION2
+def dico_extraction2(ficher_sam):
+    file = open(ficher_sam, 'r') #ouverture en mode lecture
+    # Initialiser le dictionnaire principal
+    d_sam = {
+        "FLAG": {},
+        "RNAME": {},
+        "POS": {},
+        "MAPQ": {},
+        "CIGAR": {},
+        "RNEXT": {},
+        "PNEXT": {},
+        "TLEN": {},
+    }
+
+    for i_ligne in file :
+        if i_ligne[0]!="@": #verifie que la ligne ne commence pas par @
+            l_colonnes = i_ligne.split()  #colonne correspond a une liste des element de chaque ligne qui etait separée par des tabulation
+            # Extraire les champs du fichier SAM
+            QNAME = l_colonnes[0]
+            FLAG = l_colonnes[1]
+            RNAME = l_colonnes[2]
+            POS = l_colonnes[3]
+            MAPQ = l_colonnes[4]
+            CIGAR = l_colonnes[5]
+            RNEXT = l_colonnes[6]
+            PNEXT = l_colonnes[7]
+            TLEN = l_colonnes[8]
+            SEQ = l_colonnes[9]
+            QUAL = l_colonnes[10]
+
+            # Ajouter les informations dans le dictionnaire principal
+            d_sam["FLAG"][QNAME] = FLAG
+            d_sam["RNAME"][QNAME] = RNAME
+            d_sam["POS"][QNAME] = POS
+            d_sam["MAPQ"][QNAME] = MAPQ
+            d_sam["CIGAR"][QNAME] = CIGAR
+            d_sam["RNEXT"][QNAME] = RNEXT
+            d_sam["PNEXT"][QNAME] = PNEXT
+            d_sam["TLEN"][QNAME] = TLEN
+    file.close()
+    return d_sam
+
+#print(dico_extraction2(sys.argv[1])) #decomenter pour tester
+
+
+
+####################
+#HOMERO 18/10/2024
 ####################
 #La fonction liste_flags prend en entrée une chaîne de caractères 
 #correspondant au chemin d'un fichier SAM et retourne une liste contenant
