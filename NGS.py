@@ -75,32 +75,34 @@ def dico_extraction1(fichier_sam):
 def analyse_CIGAR(d_sam):
     # Initialiser un dictionnaire pour compter les opérations CIGAR
     comptes_CIGAR = {
-    'M': 0,  # Match (alignement de base)
-    'I': 0,  # Insertion (délétion dans la séquence de référence)
-    'D': 0,  # Deletion (insertion dans la séquence cible)
-    'N': 0,  # Skipping (indication de l'existence d'un intron)
-    'S': 0,  # Soft clipping (bases coupées mais conservées dans le fichier SAM)
-    'H': 0,  # Hard clipping (bases coupées et non enregistrées)
-    'P': 0,  # Padding (espaces réservés dans l'alignement)
-    '=': 0,  # Identique (opérations qui correspondent aux bases de la séquence)
-    'X': 0,  # Mismatch (mismatch entre les bases d'alignement)
-    '*': 0   # Opérations non spécifiées ou indéfinies
-}
+        'M': 0,  # Match (alignement de base)
+        'I': 0,  # Insertion (délétion dans la séquence de référence)
+        'D': 0,  # Deletion (insertion dans la séquence cible)
+        'N': 0,  # Skipping (indication de l'existence d'un intron)
+        'S': 0,  # Soft clipping (bases coupées mais conservées dans le fichier SAM)
+        'H': 0,  # Hard clipping (bases coupées et non enregistrées)
+        'P': 0,  # Padding (espaces réservés dans l'alignement)
+        '=': 0,  # Identique (opérations qui correspondent aux bases de la séquence)
+        'X': 0,  # Mismatch (mismatch entre les bases d'alignement)
+        '*': 0   # Opérations non spécifiées ou indéfinies
+    }
 
     # Parcourir chaque lecture dans le dictionnaire d_sam
     for read in d_sam.values():
         CIGAR_d_sam = read["CIGAR"]  # Extraire le CIGAR du dico sam
 
-        iCig = 0  # Initialiser l'indice de la chaîne CIGAR
+        iCig = 0  # Initialisation de notre indice pour la chaîne CIGAR
+        
         while iCig < len(CIGAR_d_sam):
             # Trouver la taille de l'opération CIGAR
             jCig = iCig
-            while jCig < len(CIGAR_d_sam) and CIGAR_d_sam[jCig].isdigit():
+            
+            while jCig < len(CIGAR_d_sam) and CIGAR_d_sam[jCig].isdigit(): #Vérifier qu'on sort pas du CIGAR et que l'on traite le nombre d'occurence de l'événement
                 jCig += 1
+       
+            taille_str = CIGAR_d_sam[iCig:jCig]  # Extraction de l'événement
             
-            taille_str = CIGAR_d_sam[iCig:jCig]  # Extraire la taille
-            
-            if not taille_str:  # Si la taille est vide
+            if not taille_str:  # Gère nos cas où l'événement est unique dans le CIGAR
                 iCig = jCig + 1  # Passer à l'élément suivant pour éviter une boucle infinie
                 continue  # Passer à la prochaine itération du while principal
 
@@ -118,33 +120,45 @@ def analyse_CIGAR(d_sam):
             # Passer à l'élément suivant du CIGAR
             iCig = jCig + 1
 
-   
     # Calculer le total des opérations et les pourcentages en une seule étape
     total_operations = sum(comptes_CIGAR.values())
+
     # Initialisation du dictionnaire des pourcentages
     pourcentages_CIGAR = {
-    'M': (comptes_CIGAR['M'] / total_operations * 100) if total_operations > 0 else 0,  # Match
-    'I': (comptes_CIGAR['I'] / total_operations * 100) if total_operations > 0 else 0,  # Insertion
-    'D': (comptes_CIGAR['D'] / total_operations * 100) if total_operations > 0 else 0,  # Deletion
-    'N': (comptes_CIGAR['N'] / total_operations * 100) if total_operations > 0 else 0,  # Skipping
-    'S': (comptes_CIGAR['S'] / total_operations * 100) if total_operations > 0 else 0,  # Soft clipping
-    'H': (comptes_CIGAR['H'] / total_operations * 100) if total_operations > 0 else 0,  # Hard clipping
-    'P': (comptes_CIGAR['P'] / total_operations * 100) if total_operations > 0 else 0,  # Padding
-    '=': (comptes_CIGAR['='] / total_operations * 100) if total_operations > 0 else 0,  # Identique
-    'X': (comptes_CIGAR['X'] / total_operations * 100) if total_operations > 0 else 0,  # Mismatch
-    '*': (comptes_CIGAR['*'] / total_operations * 100) if total_operations > 0 else 0   # Opérations non spécifiées
-}
+        'Alignés match ou mismatch(M)': (comptes_CIGAR['M'] / total_operations * 100) if total_operations > 0 else 0,
+        'Insertions (I)': (comptes_CIGAR['I'] / total_operations * 100) if total_operations > 0 else 0,
+        'Délétions (D)': (comptes_CIGAR['D'] / total_operations * 100) if total_operations > 0 else 0,
+        'Sauts de bases (N)': (comptes_CIGAR['N'] / total_operations * 100) if total_operations > 0 else 0,
+        'Soft Clipping (S)': (comptes_CIGAR['S'] / total_operations * 100) if total_operations > 0 else 0,
+        'Hard Clipping (H)': (comptes_CIGAR['H'] / total_operations * 100) if total_operations > 0 else 0,
+        'Complétion (P)': (comptes_CIGAR['P'] / total_operations * 100) if total_operations > 0 else 0,
+        'base match (=)': (comptes_CIGAR['='] / total_operations * 100) if total_operations > 0 else 0,
+        'bases mismatch (X)': (comptes_CIGAR['X'] / total_operations * 100) if total_operations > 0 else 0,
+        'Événements non spécifiés (*)': (comptes_CIGAR['*'] / total_operations * 100) if total_operations > 0 else 0
+    }
 
-
+    print("Distribution des données CIGAR pour évaluation de l'alignement")
     # Afficher les résultats
     for operation, pourcentage in pourcentages_CIGAR.items():
         print(f"{operation}: {pourcentage:.3f}%")
+
     print(f"\nTotal des opérations : {total_operations}")
-
-    #return comptes_CIGAR, pourcentages_CIGAR, total_operations
-
-# Exemple d'appel
+    
+#Affichage des informations de d'appariements et FLAG couplés aux informations de distributions des évènements stockés dans les CIGARs ; 
 print(analyse_CIGAR(dico_extraction1(fichier_sam)))
+
+
+
+
+#----------------------------------------------------------------------------------------#
+
+# Pour HOMERO 07/11 : Ici il faut que l'on fasse un camembert avec maplot lib ou intégrer du code R (ggplot) que ce soit plus rigoureux et adaptés.
+# Ce que je te propose sur la base de ce que j'ai fais pour les CIGARS cette nuit : 
+#   - Je reproduis une structure itérative équivalente pour criblé les lectures et sortir les occurences de chaque base, evènements indel ou autre.    - Je réfléchis à la manière de représenter les distributions pour CIGAR et les %ATGC dans R avec ggplot
+#   - Je veux bien réfléchir à Jupyternotebook en dernier lieux
+
+# Ouvert a tes autres suggestions si tu veux faire un travail avec un jeu de boucles sur les autres items du dictionnaires qui te parait pertinent pour représenter les données?
+# Pour la partie Pourcentage CIGAR je me suis pas cassé la tete, au début j'avais fait ca avec op pour simplifier la synthaxe du dictionnaire mais c'était pas cohérent donc j'ai modifier les produits en croix et j'ai fais copier coller pour chaque évènement.
 
 
 #DICOEXTRACTION2
