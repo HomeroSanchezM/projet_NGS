@@ -49,6 +49,7 @@ def dico_extraction1(fichier_sam):
             RNEXT = l_colonnes[6]
             PNEXT = l_colonnes[7]
             TLEN = l_colonnes[8]
+            SEQ = l_colonnes[9]
 
             # Ajouter les informations dans le dictionnaire
             d_sam[QNAME] = {
@@ -60,13 +61,60 @@ def dico_extraction1(fichier_sam):
                 "RNEXT": RNEXT,
                 "PNEXT": PNEXT,
                 "TLEN": TLEN,
+                "SEQ": SEQ
             }
             
     file.close()#on referme le fichier SAM
     return d_sam
-
+    
 
 #print(dico_extraction1(sys.argv[1])) #decommenter pour tester
+
+#################
+# Mickael 07/11/24
+#################
+def analyse_SEQ(d_sam):  
+    comptes_base = {'A': 0, 'T': 0, 'G': 0, 'C': 0}
+    
+    for read in d_sam.values():
+        Seq_d_sam = read["SEQ"]
+        
+        for base in Seq_d_sam:
+            if base in comptes_base:
+                comptes_base[base] += 1
+    
+    total_BASE = sum(comptes_base.values())
+    
+    pourcentages_BASE = {
+        'A': (comptes_base['A'] / total_BASE * 100) if total_BASE > 0 else 0,
+        'T': (comptes_base['T'] / total_BASE * 100) if total_BASE > 0 else 0,
+        'G': (comptes_base['G'] / total_BASE * 100) if total_BASE > 0 else 0,
+        'C': (comptes_base['C'] / total_BASE * 100) if total_BASE > 0 else 0
+    }
+    
+    return comptes_base, pourcentages_BASE, total_BASE
+
+
+# Appel de la fonction dico_extraction1 pour obtenir le dictionnaire d_sam
+d_sam = dico_extraction1(fichier_sam)
+
+# Appel de la fonction analyse_SEQ avec d_sam comme argument
+comptes, pourcentages, total = analyse_SEQ(d_sam)
+
+# Affichage des résultats
+print("Comptes des bases :", comptes)
+print("")
+print("Total des bases : ", total)
+
+print("")  # Ligne vide pour séparer les deux parties
+
+# Affichage des pourcentages avec 2 chiffres après la virgule
+print("Pourcentages des bases :")
+print("--------------------------------------------------------")
+
+for base, pourcent in pourcentages.items():
+    print(f"  {base}: {pourcent:.2f}%")
+print("--------------------------------------------------------")
 
 #################
 #Mickael 06/11/24
@@ -87,7 +135,7 @@ def analyse_CIGAR(d_sam):
         '*': 0   # Opérations non spécifiées ou indéfinies
     }
 
-    # Parcourir chaque lecture dans le dictionnaire d_sam
+    # Parcourir chaque CIGAR dans le dictionnaire d_sam
     for read in d_sam.values():
         CIGAR_d_sam = read["CIGAR"]  # Extraire le CIGAR du dico sam
 
@@ -123,7 +171,7 @@ def analyse_CIGAR(d_sam):
     # Calculer le total des opérations et les pourcentages en une seule étape
     total_operations = sum(comptes_CIGAR.values())
 
-    # Initialisation du dictionnaire des pourcentages
+    # Initialisation du dictionnaire des pourcentages CIGAR
     pourcentages_CIGAR = {
         'Alignés match ou mismatch(M)': (comptes_CIGAR['M'] / total_operations * 100) if total_operations > 0 else 0,
         'Insertions (I)': (comptes_CIGAR['I'] / total_operations * 100) if total_operations > 0 else 0,
@@ -145,9 +193,8 @@ def analyse_CIGAR(d_sam):
     print(f"\nTotal des opérations : {total_operations}")
     
 #Affichage des informations de d'appariements et FLAG couplés aux informations de distributions des évènements stockés dans les CIGARs ; 
+
 print(analyse_CIGAR(dico_extraction1(fichier_sam)))
-
-
 
 
 #----------------------------------------------------------------------------------------#
