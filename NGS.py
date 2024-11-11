@@ -36,6 +36,7 @@ fichier_sam = sys.argv[1]
 def dico_extraction1(fichier_sam):
     file = open(fichier_sam, 'r') #ouverture en mode lecture
     d_sam = {} #creation du dico vide pour contenir les info des reads
+    id_ligne = 1
     for i_ligne in file :
         if i_ligne[0]!="@": #verifie que la ligne ne commence pas par @
             l_colonnes = i_ligne.split()  #colonne correspond a une liste des elements de chaque ligne qui etait separée par des tabulations (découpe la ligne en colonnes)
@@ -52,7 +53,8 @@ def dico_extraction1(fichier_sam):
             SEQ = l_colonnes[9]
 
             # Ajouter les informations dans le dictionnaire
-            d_sam[QNAME] = {
+            d_sam[id_ligne] = {
+                "QNAME":QNAME,
                 "FLAG": FLAG,
                 "RNAME": RNAME,
                 "POS": POS,
@@ -63,7 +65,7 @@ def dico_extraction1(fichier_sam):
                 "TLEN": TLEN,
                 "SEQ": SEQ
             }
-            
+            id_ligne+=1
     file.close()#on referme le fichier SAM
     return d_sam
     
@@ -201,14 +203,17 @@ print(analyse_CIGAR(dico_extraction1(fichier_sam)))
 
 # Pour HOMERO 07/11 : Ici il faut que l'on fasse un camembert avec maplot lib ou intégrer du code R (ggplot) que ce soit plus rigoureux et adaptés.
 # Ce que je te propose sur la base de ce que j'ai fais pour les CIGARS cette nuit : 
-#   - Je reproduis une structure itérative équivalente pour criblé les lectures et sortir les occurences de chaque base, evènements indel ou autre.    - Je réfléchis à la manière de représenter les distributions pour CIGAR et les %ATGC dans R avec ggplot
+#   - Je reproduis une structure itérative équivalente pour criblé les lectures et sortir les occurences de chaque base, evènements indel ou autre.   
+#  - Je réfléchis à la manière de représenter les distributions pour CIGAR et les %ATGC dans R avec ggplot
 #   - Je veux bien réfléchir à Jupyternotebook en dernier lieux
 
 # Ouvert a tes autres suggestions si tu veux faire un travail avec un jeu de boucles sur les autres items du dictionnaires qui te parait pertinent pour représenter les données?
 # Pour la partie Pourcentage CIGAR je me suis pas cassé la tete, au début j'avais fait ca avec op pour simplifier la synthaxe du dictionnaire mais c'était pas cohérent donc j'ai modifier les produits en croix et j'ai fais copier coller pour chaque évènement.
 
 
-#DICOEXTRACTION2
+
+
+#DICOEXTRACTION2 PAS UTILISER
 #{
 #    "FLAG": {
 #        "QNAME1": FLAG1,
@@ -226,50 +231,50 @@ print(analyse_CIGAR(dico_extraction1(fichier_sam)))
 #    },
 #      etc.
 #}
-
-
+#
+#
 #La fonction dico_extraction1 prend en entrée une chaîne de caractères 
 #correspondant au chemin d'un fichier SAM et retourne une dico de la forme du DICOEXTRACTION2
-def dico_extraction2(ficher_sam):
-    file = open(ficher_sam, 'r') #ouverture en mode lecture
-    # Initialiser le dictionnaire principal
-    d_sam = {
-        "FLAG": {},
-        "RNAME": {},
-        "POS": {},
-        "MAPQ": {},
-        "CIGAR": {},
-        "RNEXT": {},
-        "PNEXT": {},
-        "TLEN": {},
-    }
-
-    for i_ligne in file :
-        if i_ligne[0]!="@": #verifie que la ligne ne commence pas par @
-            l_colonnes = i_ligne.split()  #colonne correspond a une liste des element de chaque ligne qui etait separée par des tabulation
-            # Extraire les champs du fichier SAM
-            QNAME = l_colonnes[0]
-            FLAG = l_colonnes[1]
-            RNAME = l_colonnes[2]
-            POS = l_colonnes[3]
-            MAPQ = l_colonnes[4]
-            CIGAR = l_colonnes[5]
-            RNEXT = l_colonnes[6]
-            PNEXT = l_colonnes[7]
-            TLEN = l_colonnes[8]
-            
-
-            # Ajouter les informations dans le dictionnaire principal
-            d_sam["FLAG"][QNAME] = FLAG
-            d_sam["RNAME"][QNAME] = RNAME
-            d_sam["POS"][QNAME] = POS
-            d_sam["MAPQ"][QNAME] = MAPQ
-            d_sam["CIGAR"][QNAME] = CIGAR
-            d_sam["RNEXT"][QNAME] = RNEXT
-            d_sam["PNEXT"][QNAME] = PNEXT
-            d_sam["TLEN"][QNAME] = TLEN
-    file.close()
-    return d_sam
+#def dico_extraction2(ficher_sam):
+#    file = open(ficher_sam, 'r') #ouverture en mode lecture
+#    # Initialiser le dictionnaire principal
+#    d_sam = {
+#        "FLAG": {},
+#        "RNAME": {},
+#        "POS": {},
+#        "MAPQ": {},
+#        "CIGAR": {},
+#        "RNEXT": {},
+#        "PNEXT": {},
+#        "TLEN": {},
+#    }
+#
+#    for i_ligne in file :
+#        if i_ligne[0]!="@": #verifie que la ligne ne commence pas par @
+#            l_colonnes = i_ligne.split()  #colonne correspond a une liste des element de chaque ligne qui etait separée par des tabulation
+#            # Extraire les champs du fichier SAM
+#            QNAME = l_colonnes[0]
+#            FLAG = l_colonnes[1]
+#            RNAME = l_colonnes[2]
+#            POS = l_colonnes[3]
+#            MAPQ = l_colonnes[4]
+#            CIGAR = l_colonnes[5]
+#            RNEXT = l_colonnes[6]
+#            PNEXT = l_colonnes[7]
+#            TLEN = l_colonnes[8]
+#            
+#
+#            # Ajouter les informations dans le dictionnaire principal
+#            d_sam["FLAG"][QNAME] = FLAG
+#            d_sam["RNAME"][QNAME] = RNAME
+#            d_sam["POS"][QNAME] = POS
+#            d_sam["MAPQ"][QNAME] = MAPQ
+#            d_sam["CIGAR"][QNAME] = CIGAR
+#            d_sam["RNEXT"][QNAME] = RNEXT
+#            d_sam["PNEXT"][QNAME] = PNEXT
+#            d_sam["TLEN"][QNAME] = TLEN
+#    file.close()
+#    return d_sam
 
 #print(dico_extraction2(sys.argv[1])) #decomenter pour tester
 
@@ -278,19 +283,20 @@ def dico_extraction2(ficher_sam):
 ####################
 #HOMERO 18/10/2024
 ####################
+#non utiliser
 #La fonction liste_flags prend en entrée une chaîne de caractères 
 #correspondant au chemin d'un fichier SAM et retourne une liste contenant
 #l'ensemble des flags du fichier
-
-def liste_flags(ficher_sam):
-    file = open(ficher_sam, 'r') #ouverture en mode lecture
-    l_flags = [] #creation de liste vide pour contenir les flags
-    for i_ligne in file :
-        if i_ligne[0]!="@": #verifie que la ligne ne commence pas par @
-            l_colonnes = i_ligne.split()  #colonne correspond a une liste des element de chaque ligne qui etait separée par des tabulation
-            l_flags.append(l_colonnes[1]) #on ajoute a la liste flag la valeur de la deuxieme colonne de chaque ligne
-    file.close()#on referme le fichier SAM
-    return l_flags
+#
+#def liste_flags(ficher_sam):
+#    file = open(ficher_sam, 'r') #ouverture en mode lecture
+#    l_flags = [] #creation de liste vide pour contenir les flags
+#    for i_ligne in file :
+#        if i_ligne[0]!="@": #verifie que la ligne ne commence pas par @
+#            l_colonnes = i_ligne.split()  #colonne correspond a une liste des element de chaque ligne qui etait separée par des tabulation
+#            l_flags.append(l_colonnes[1]) #on ajoute a la liste flag la valeur de la deuxieme colonne de chaque ligne
+#    file.close()#on referme le fichier SAM
+#    return l_flags
 
  
 #print(liste_flags(sys.argv[1]))#Prend le chemin du chemin du fichier sam donne en parametre
@@ -300,14 +306,14 @@ def liste_flags(ficher_sam):
 #retourne un dictionnaire avec comme clés les flags et comme 
 #valeurs le nombre de fois que chaque flag est présent dans la liste.
 
-def Dico_flags(l_flags):
-    d_flags = {} #creation d'un dictionnaire vide
-    for i_flag in l_flags:
-        if i_flag in d_flags: #verifie si une clé est déja dans le dictionnaire
-            d_flags[i_flag] += 1 #si elle exite deja, on l'incremente de 1
-        else:
-            d_flags[i_flag] = 1 #si la clé n'existe pas on la crée et on lui donne la valeur 1
-    return d_flags
+#def Dico_flags(l_flags):
+#    d_flags = {} #creation d'un dictionnaire vide
+#    for i_flag in l_flags:
+#        if i_flag in d_flags: #verifie si une clé est déja dans le dictionnaire
+#            d_flags[i_flag] += 1 #si elle exite deja, on l'incremente de 1
+#        else:
+#            d_flags[i_flag] = 1 #si la clé n'existe pas on la crée et on lui donne la valeur 1
+#    return d_flags
 
 #print(Dico_flags(liste_flags(sys.argv[1]))) # afficher le dictionnaire 
 
@@ -320,9 +326,9 @@ def Dico_flags(l_flags):
 #On va élaborer un dictionnaire de correspondances des flags établir une correspondance pour pouvoir 
 
 #création d'un tableau avec le dictionnaire retourner par Dico_flags
-d_flags =Dico_flags(liste_flags(sys.argv[1]))
+#d_flags =Dico_flags(liste_flags(sys.argv[1]))
 #Créer un DataFrame à partir du dictionnaire
-t_flags = pd.DataFrame(list(d_flags.items()), columns=['Flag', 'nb de fois présent'])
+#t_flags = pd.DataFrame(list(d_flags.items()), columns=['Flag', 'nb de fois présent'])
 #Afficher le tableau
 #print(t_flags)
 
@@ -365,9 +371,46 @@ def decodage_flags(valeur_du_flag):
 ####################
 #HOMERO 28/10/2024#
 ####################
-
+#non utiliser
 #création d'un  dictionnaire retourner par Dico_flags
-d_flags =Dico_flags(liste_flags(sys.argv[1]))
+#d_flags =Dico_flags(liste_flags(sys.argv[1]))
+#
+#ajout a ce dictionnaire les commmentaire de decodate_flags
+#
+#for i_flag in d_flags:
+#    l_decodage = decodage_flags(int(i_flag)) #création d'une liste avec les commentaires correspondant a chaque flag 
+#    i_nb_fois_present = d_flags[i_flag] #recupere la valeur du nombre de flag present associe a chaque flag 
+#    d_flags[i_flag] = [i_nb_fois_present, l_decodage ] #associe a chaque flag une liste avec le nombre de fois que le flag est present et une liste avec les commentaires correspondant au flag
+#
+# Conversion du dictionnaire en une liste de tuples [(clé, valeur1, valeur2), ...]
+#data = [(cle, valeurs[0], valeurs[1]) for cle, valeurs in d_flags.items()]
+#
+# Création du DataFrame avec les colonnes spécifiées
+#t_flags = pd.DataFrame(data, columns=['Flag', 'nb de fois présent', 'decodage'])
+#
+# Affichage du DataFrame
+#print(t_flags)
+#
+####################
+#HOMERO 11/11/2024
+###################
+#Analyse des flag en utilisant les info extraite par dico_extraction1 contenu par d_sam (cf ligne 99)
+
+def analyse_flag(d_sam):  
+    d_flags = {}
+    for read in d_sam.values():
+        flag_d_sam = read["FLAG"]
+        
+        if flag_d_sam in d_flags: #verifie si une clé est déja dans le dictionnaire
+            d_flags[flag_d_sam] += 1 #si elle exite deja, on l'incremente de 1
+        else:
+            d_flags[flag_d_sam] = 1 #si la clé n'existe pas on la crée et on lui donne la valeur 1
+    return d_flags
+
+#print(analyse_flag(d_sam)) # afficher le dictionnaire 
+
+#création d'un  dictionnaire retourner par analyse_flag
+d_flags =analyse_flag(d_sam)
 
 #ajout a ce dictionnaire les commmentaire de decodate_flags
 
