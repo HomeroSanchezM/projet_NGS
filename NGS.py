@@ -36,6 +36,7 @@ fichier_sam = sys.argv[1]
 def dico_extraction1(fichier_sam):
     file = open(fichier_sam, 'r') #ouverture en mode lecture
     d_sam = {} #creation du dico vide pour contenir les info des reads
+    id_ligne = 1
     for i_ligne in file :
         if i_ligne[0]!="@": #verifie que la ligne ne commence pas par @
             l_colonnes = i_ligne.split()  #colonne correspond a une liste des elements de chaque ligne qui etait separée par des tabulations (découpe la ligne en colonnes)
@@ -52,7 +53,8 @@ def dico_extraction1(fichier_sam):
             SEQ = l_colonnes[9]
 
             # Ajouter les informations dans le dictionnaire
-            d_sam[QNAME] = {
+            d_sam[id_ligne] = {
+                "QNAME":QNAME,
                 "FLAG": FLAG,
                 "RNAME": RNAME,
                 "POS": POS,
@@ -63,7 +65,7 @@ def dico_extraction1(fichier_sam):
                 "TLEN": TLEN,
                 "SEQ": SEQ
             }
-            
+            id_ligne+=1
     file.close()#on referme le fichier SAM
     return d_sam
     
@@ -201,13 +203,15 @@ print(analyse_CIGAR(dico_extraction1(fichier_sam)))
 
 # Pour HOMERO 07/11 : Ici il faut que l'on fasse un camembert avec maplot lib ou intégrer du code R (ggplot) que ce soit plus rigoureux et adaptés.
 # Ce que je te propose sur la base de ce que j'ai fais pour les CIGARS cette nuit : 
-#   - Je reproduis une structure itérative équivalente pour criblé les lectures et sortir les occurences de chaque base, evènements indel ou autre.    - Je réfléchis à la manière de représenter les distributions pour CIGAR et les %ATGC dans R avec ggplot
+#   - Je reproduis une structure itérative équivalente pour criblé les lectures et sortir les occurences de chaque base, evènements indel ou autre.   
+#  - Je réfléchis à la manière de représenter les distributions pour CIGAR et les %ATGC dans R avec ggplot
 #   - Je veux bien réfléchir à Jupyternotebook en dernier lieux
 
 # Ouvert a tes autres suggestions si tu veux faire un travail avec un jeu de boucles sur les autres items du dictionnaires qui te parait pertinent pour représenter les données?
 # Pour la partie Pourcentage CIGAR je me suis pas cassé la tete, au début j'avais fait ca avec op pour simplifier la synthaxe du dictionnaire mais c'était pas cohérent donc j'ai modifier les produits en croix et j'ai fais copier coller pour chaque évènement.
 
 
+<<<<<<< HEAD
 #DICOEXTRACTION2
 #{
 #    "FLAG": {
@@ -325,6 +329,8 @@ t_flags = pd.DataFrame(list(d_flags.items()), columns=['Flag', 'nb de fois prés
 #Afficher le tableau
 #print(t_flags)
 
+=======
+>>>>>>> 02bd13f1aaface7058be7db16c95f9b7cadbfd11
 
 ###################
 # MICKAEL 19/10/2024
@@ -361,9 +367,46 @@ def decodage_flags(valeur_du_flag):
 ####################
 #HOMERO 28/10/2024#
 ####################
-
+#non utiliser
 #création d'un  dictionnaire retourner par Dico_flags
-d_flags =Dico_flags(liste_flags(sys.argv[1]))
+#d_flags =Dico_flags(liste_flags(sys.argv[1]))
+#
+#ajout a ce dictionnaire les commmentaire de decodate_flags
+#
+#for i_flag in d_flags:
+#    l_decodage = decodage_flags(int(i_flag)) #création d'une liste avec les commentaires correspondant a chaque flag 
+#    i_nb_fois_present = d_flags[i_flag] #recupere la valeur du nombre de flag present associe a chaque flag 
+#    d_flags[i_flag] = [i_nb_fois_present, l_decodage ] #associe a chaque flag une liste avec le nombre de fois que le flag est present et une liste avec les commentaires correspondant au flag
+#
+# Conversion du dictionnaire en une liste de tuples [(clé, valeur1, valeur2), ...]
+#data = [(cle, valeurs[0], valeurs[1]) for cle, valeurs in d_flags.items()]
+#
+# Création du DataFrame avec les colonnes spécifiées
+#t_flags = pd.DataFrame(data, columns=['Flag', 'nb de fois présent', 'decodage'])
+#
+# Affichage du DataFrame
+#print(t_flags)
+#
+####################
+#HOMERO 11/11/2024
+###################
+#Analyse des flag en utilisant les info extraite par dico_extraction1 contenu par d_sam (cf ligne 99)
+
+def analyse_flag(d_sam):  
+    d_flags = {}
+    for read in d_sam.values():
+        flag_d_sam = read["FLAG"]
+        
+        if flag_d_sam in d_flags: #verifie si une clé est déja dans le dictionnaire
+            d_flags[flag_d_sam] += 1 #si elle exite deja, on l'incremente de 1
+        else:
+            d_flags[flag_d_sam] = 1 #si la clé n'existe pas on la crée et on lui donne la valeur 1
+    return d_flags
+
+#print(analyse_flag(d_sam)) # afficher le dictionnaire 
+
+#création d'un  dictionnaire retourner par analyse_flag
+d_flags =analyse_flag(d_sam)
 
 #ajout a ce dictionnaire les commmentaire de decodate_flags
 
@@ -382,4 +425,8 @@ t_flags = pd.DataFrame(data, columns=['Flag', 'nb de fois présent', 'decodage']
 print(t_flags)
 
 
+<<<<<<< HEAD
 
+=======
+#couverture: nb de read mappé/taille de chromosome
+>>>>>>> 02bd13f1aaface7058be7db16c95f9b7cadbfd11
