@@ -9,7 +9,8 @@ import pandas as pd #pour faire des tableau
 
 #DICOEXTRACTION1
 #{
-#    "QNAME1": {
+#    1: {
+#        "QNAME1": QNAME1,
 #        "FLAG": FLAG1,
 #        "RNAME": RNAME1,
 #        "POS": POS1,
@@ -21,7 +22,8 @@ import pandas as pd #pour faire des tableau
 #        "SEQ": SEQ1,
 #        "QUAL": QUAL1
 #    },
-#    "QNAME2": {
+#    2: {
+#        "QNAME1": QNAME2,
 #        "FLAG": FLAG2,
 #        "RNAME": RNAME2,
 #        # etc.
@@ -284,4 +286,19 @@ t_flags = pd.DataFrame(data, columns=['Flag', 'nb de fois présent', 'decodage']
 # Affichage du DataFrame
 print(t_flags)
 
+######################
+#HOMERO 12/11/2024
+#####################
 
+#on donne le nombre de read total
+
+print ("nombre de reads : " , len(d_sam))
+#on donne le pourcentage de read correctement apparié
+
+read_aligné = 0
+for i_flag in d_flags:
+    if "- Segment apparié correctement selon les critères de l'aligneur." in d_flags[i_flag][1]:
+        read_aligné+=d_flags[i_flag][0]
+print ("nombre de reads apparié correctement selon les critères de l'aligneur : ", read_aligné)
+print ("pourcentage de read correctement apparié : ",(read_aligné/len(d_sam))*100)
+#"- Segment apparié correctement selon les critères de l'aligneur."
