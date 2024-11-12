@@ -428,3 +428,5 @@ t_flags = pd.DataFrame(data, columns=['Flag', 'nb de fois présent', 'decodage']
 # Affichage du DataFrame
 print(t_flags)
 
+
+#couverture: nb de read mappé/taille de chromosome
