@@ -10,7 +10,7 @@ sep="---------------------------------------------------------------------------
 Script1="NGS.py"
 
 #-------------------------------------- #
-# Contrôles des conformités sur l'input #
+# Contrôles de conformité sur l'input   #
 #-------------------------------------- #
 
 Rep="" # J'initialise mon Rep à null dans l'hypothèse où la conjonction de mes vérifications renverrait false.
@@ -30,12 +30,15 @@ else
    
     echo -e "\nNos contrôles préliminaires sont terminés, création du rapport de sortie au format csv ... \n"
 
-    #-------------------------------------- #
-    # Génération de l'output au format .csv #
-    #-------------------------------------- #
-  
-    # Créer le fichier output.csv avec la première ligne d'en-tête
-    echo "FLAG_REPERE,NOMBRE_OCCURENCES,TRANSLATE_FLAG" > output.csv
+# ------------------------------------------------------------------------------------------------------------------------------------------------------#
+# Création d'un Output format .csv avec une dénomination qui va gérer les éxecutions successives du programme pour éviter l'écrasement de l'output n-1  #
+# ----------------------------------------------------------------------------------------------------------------------------------------------------- #
+# Définir le nom du fichier de sortie avec la date :
+Output_CSV="Output_DATA_$(date +"%Y%m%d").csv"
+
+# Créer le fichier avec la première ligne d'en-tête
+echo "Fichier d'extraction des métriques SAM : " > "$Output_CSV"
+
     
     # On lance NGS.py pour repérer les FLAGS présents et compter leurs occurrences.
     python3 "$Script1" "$1"
@@ -51,7 +54,6 @@ else
     # Affichage du temps de traitement
     endNGSpy=$(date +%s) 
     echo -e "\nTemps de traitement : $((endNGSpy - debNGSpy)) secondes"
-    
    
 fi
 

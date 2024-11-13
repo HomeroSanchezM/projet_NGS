@@ -1,0 +1,41 @@
+ab59b24 | 2024-11-12 | Homero Sanchez | supression de commentaires
+a6cf775 | 2024-11-12 | Mickael | Modifs Flags
+d410c6d | 2024-11-12 | Mickael | Modif com's FLAG
+02bd13f | 2024-11-12 | Homero Sanchez | elimination commentaires
+ba37704 | 2024-11-12 | Homero Sanchez | ajout commentaire
+a8b5f9b | 2024-11-11 | Homero Sanchez | modification dico_extraction1 et analyse des flag en utilisant dico_extraction1
+4f1bfc2 | 2024-11-07 | Mickael | Fonction frequence Relative ATGC
+b0ce1be | 2024-11-06 | Mickael | Modifications MEF dico CIGAR
+0ba8adf | 2024-11-05 | Mickael | Ajustement des dico def analyse_CIGAR
+f4b5745 | 2024-11-05 | Mickael | Code f(CIGAR)
+3e9e702 | 2024-11-05 | Homero Sanchez | ajout des fonctions dicoextraction1 et dicoextraction2, petite modification
+e24a315 | 2024-11-05 | Homero Sanchez | ajout des fonctions dicoextraction1 et dicoextraction2
+3fd308e | 2024-10-28 | Homero Sanchez | ajout de la colonne décodage au tableau des flags
+9a21be2 | 2024-10-20 | Mickael | Merge branch 'main' of https://github.com/HomeroSanchezM/projet_NGS
+344b2cc | 2024-10-20 | Mickael | Ajout dans le main.sh d'instructions pour générer une output.csv (pas encore incrémentée)
+0035b1f | 2024-10-20 | Mickael.C | Update README.md
+3b00e5d | 2024-10-20 | Mickael.C | Update README with Translate_FLAG .md
+8e67736 | 2024-10-20 | Mickael | Mise à jour globale
+4649618 | 2024-10-20 | Mickael | Modification du nom du traducteur de FLAG et finalisation du script
+202a323 | 2024-10-19 | Mickael | Ajout du prog pour générer la traduction des FLAG
+60c42c3 | 2024-10-18 | Mickael | Mise à jour du README
+2a12c1f | 2024-10-18 | Mickael | Ajout du temps de traitement NGS.py
+5218845 | 2024-10-18 | Mickael | Correction orthographe sur le main
+eb0f2e6 | 2024-10-18 | Mickael | Merge branch 'main' of https://github.com/HomeroSanchezM/projet_NGS
+8f3e75d | 2024-10-18 | Homero Sanchez | correction lignes à considerer
+6daefb6 | 2024-10-18 | Mickael | V1 Booleens conditions preliminaires
+02c9d6d | 2024-10-18 | Homero Sanchez | création d'un tableau t_flags
+116d58d | 2024-10-18 | Homero Sanchez | modification du README
+c363f07 | 2024-10-18 | Homero Sanchez | modification du README
+a2f6475 | 2024-10-18 | Homero Sanchez | création fontion Dico_flags
+19afd39 | 2024-10-18 | Homero Sanchez | modification du README
+642a619 | 2024-10-18 | Homero Sanchez | création fontion liste_flags
+c90b1a6 | 2024-10-18 | Homero Sanchez | affichage de toutes les lignes du lichier sam
+11c28ce | 2024-10-18 | Homero Sanchez | effacer fd.close()
+b2c7236 | 2024-10-18 | Mickael | Ajout des consignes du projet
+cba87b6 | 2024-10-18 | Homero Sanchez | affichage les lignes de sam
+77afe65 | 2024-10-18 | Homero Sanchez | affichege des lignes du fichier sam
+ae05d33 | 2024-10-18 | Mickael | Ajout du main et d'un fichier sam test
+a4e41f3 | 2024-10-17 | Mickael | Essai modif et consultation micka
+68814a7 | 2024-10-16 | Homero Sanchez | ajout de NGS.py
+0666099 | 2024-10-15 | Mickael.C | Initial commit

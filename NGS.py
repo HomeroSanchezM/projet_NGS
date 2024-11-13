@@ -1,11 +1,16 @@
-import sys #pour donner des parametres lors de l'appel de la fonction sur le terminal ou dans un .sh
-import pandas as pd #pour faire des tableau
+import sys          # Pour donner des parametres lors de l'appel de la fonction sur le terminal ou dans un .sh
+import pandas as pd # Pour faire des tableau
+import re           # Exploitation des regex pour extraire les motifs du CIGAR
 
-####################
-#HOMERO 5/11/2024
-####################
 
-#format du dictionnaire d'extraction:
+
+# DANS LE README :
+# DIRE CE QUE LE PROGRAMME FAIT
+# FAIRE UN REQUIREMENT TXT AVEC TOUS LES PREREQUIS ET SURTOUT LENVIRONNEMENT DETRAVAIL
+# QUELLE TYPE DE FICHIER EN ENTREE ET OU IL DOIT SE TROUVER ET SOUS QUEL FORMAT
+# COMMENT LE SCRIPT FONCTIONNE.
+# BIEN EXPLIQUE L'OUTPUT.
+# LICENCE POUR LES GENS QUI UTILISE NOTRE CODE ET LA VERSION, 
 
 #DICOEXTRACTION1
 #{
@@ -28,18 +33,26 @@ import pandas as pd #pour faire des tableau
 #    },
 #    # etc.
 #}
+import re
+import sys
 
 fichier_sam = sys.argv[1]
+Sep = ("-" * 70)+ "\n"
+#__________________________________________________________________________________________________________________________________________________________________________________________________________#
+#                                                                1. CREATION DU DICTIONNAIRE PRINCIPAL PAR STRUCTURE ITERATIVE FOR                                                                         #
+#__________________________________________________________________________________________________________________________________________________________________________________________________________#
 
-#La fonction dico_extraction1 prend en entrée une chaîne de caractères 
-#correspondant au chemin d'un fichier SAM et retourne une dico de la forme du DICOEXTRACTION1
+# La fonction dico_extraction1 prend en entrée une chaîne de caractères 
+# correspondant au chemin d'un fichier SAM et retourne un dictionnaire 
+# sous la forme du DICOEXTRACTION1.
+
 def dico_extraction1(fichier_sam):
-    file = open(fichier_sam, 'r') #ouverture en mode lecture
-    d_sam = {} #creation du dico vide pour contenir les info des reads
+    file = open(fichier_sam, 'r')  # Ouverture en mode lecture
+    d_sam = {}  # Création du dictionnaire vide pour contenir les infos des reads
     id_ligne = 1
-    for i_ligne in file :
-        if i_ligne[0]!="@": #verifie que la ligne ne commence pas par @
-            l_colonnes = i_ligne.split()  #colonne correspond a une liste des elements de chaque ligne qui etait separée par des tabulations (découpe la ligne en colonnes)
+    for i_ligne in file:
+        if i_ligne[0] != "@":  # Vérifie que la ligne ne commence pas par @
+            l_colonnes = i_ligne.split()  # Découpe la ligne en colonnes séparées par des tabulations
             # Extraire les champs du fichier SAM
             QNAME = l_colonnes[0]  
             FLAG = l_colonnes[1]
@@ -54,7 +67,7 @@ def dico_extraction1(fichier_sam):
 
             # Ajouter les informations dans le dictionnaire
             d_sam[id_ligne] = {
-                "QNAME":QNAME,
+                "QNAME": QNAME,
                 "FLAG": FLAG,
                 "RNAME": RNAME,
                 "POS": POS,
@@ -65,158 +78,84 @@ def dico_extraction1(fichier_sam):
                 "TLEN": TLEN,
                 "SEQ": SEQ
             }
-            id_ligne+=1
-    file.close()#on referme le fichier SAM
+            id_ligne += 1
+    file.close()  # On referme le fichier SAM
     return d_sam
-    
 
-#print(dico_extraction1(sys.argv[1])) #decommenter pour tester
-
-#################
-# Mickael 07/11/24
-#################
-def analyse_SEQ(d_sam):  
-    comptes_base = {'A': 0, 'T': 0, 'G': 0, 'C': 0}
-    
-    for read in d_sam.values():
-        Seq_d_sam = read["SEQ"]
-        
-        for base in Seq_d_sam:
-            if base in comptes_base:
-                comptes_base[base] += 1
-    
-    total_BASE = sum(comptes_base.values())
-    
-    pourcentages_BASE = {
-        'A': (comptes_base['A'] / total_BASE * 100) if total_BASE > 0 else 0,
-        'T': (comptes_base['T'] / total_BASE * 100) if total_BASE > 0 else 0,
-        'G': (comptes_base['G'] / total_BASE * 100) if total_BASE > 0 else 0,
-        'C': (comptes_base['C'] / total_BASE * 100) if total_BASE > 0 else 0
-    }
-    
-    return comptes_base, pourcentages_BASE, total_BASE
-
-
-# Appel de la fonction dico_extraction1 pour obtenir le dictionnaire d_sam
+# Appeler la fonction dico_extraction1 pour obtenir le dictionnaire d_sam
 d_sam = dico_extraction1(fichier_sam)
 
-# Appel de la fonction analyse_SEQ avec d_sam comme argument
+#__________________________________________________________________________________________________________________________________________________________________________________________________________#
+#                                      2. TRAITEMENT DES CIGARS : EXTRACTION DES VALEURS ABSOLUES, CALCUL DES SOMMES ET VALEURS RELATIVES (REGEX)                                                          #
+#__________________________________________________________________________________________________________________________________________________________________________________________________________#
+
+# Analyse des CIGAR
+def analyse_CIGAR(d_sam):
+    comptes_CIGAR = {
+        'M': ["Alignés", 0],        'I': ["Insertions", 0],    'D': ["Délétions", 0],
+        'N': ["Sauts de bases", 0], 'S': ["Soft Clipping", 0], 'H': ["Hard Clipping", 0],  
+        'P': ["Complétion", 0],     '=': ["Match exact", 0],   'X': ["Mismatch", 0] }
+        
+    REGEX_CIGAR = re.compile(r'(\d+)([MIDNSHP=X])')
+    TOTAL_OPE_CIG = 0
+
+    for read in d_sam.values():
+        matches = REGEX_CIGAR.findall(read["CIGAR"])
+        for SUM_OPE_CIG_str, OPE_CIG in matches:
+            SUM_OPE_CIG = int(SUM_OPE_CIG_str)
+            if OPE_CIG in comptes_CIGAR:
+                comptes_CIGAR[OPE_CIG][1] += SUM_OPE_CIG
+                TOTAL_OPE_CIG += SUM_OPE_CIG
+
+    # Calcul des pourcentages
+    for OPE_CIG, (commentaire, count) in comptes_CIGAR.items():
+        pourcentage = (count / TOTAL_OPE_CIG * 100) if TOTAL_OPE_CIG > 0 else 0
+        print(f"{commentaire}: {count} ({pourcentage:.2f}%)")
+
+    return comptes_CIGAR
+
+analyse_CIGAR(d_sam)
+
+
+#__________________________________________________________________________________________________________________________________________________________________________________________________________#
+#                                                                  2. ANALYSE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTIONS RELATIVES                                                                         #
+#__________________________________________________________________________________________________________________________________________________________________________________________________________#
+
+def analyse_SEQ(d_sam):  
+    comptes_base = {'A': [0, "Adénine"], 'T': [0, "Thymine"], 'G': [0, "Guanine"], 'C': [0, "Cytosine"]}
+    
+    for read in d_sam.values():  # Pour chaque séquence
+        Seq_d_sam = read["SEQ"]
+        for base in Seq_d_sam:  # Pour chaque base de chaque séquence
+            if base in comptes_base:
+                comptes_base[base][0] += 1  # Mise à jour du comptage de la base trouvée
+
+    total_BASE = sum(count[0] for count in comptes_base.values())  # Total des bases comptées
+    
+    PRCT_BASES = {  # Distribution relative des bases dans les séquences
+        base: (count[0] / total_BASE * 100) if total_BASE > 0 else 0
+        for base, count in comptes_base.items()
+    }
+    
+    return comptes_base, PRCT_BASES, total_BASE
+
+
+# Appel de la fonction analyse_SEQ
 comptes, pourcentages, total = analyse_SEQ(d_sam)
 
-# Affichage des résultats
-print("Comptes des bases :", comptes)
-print("")
-print("Total des bases : ", total)
-
-print("")  # Ligne vide pour séparer les deux parties
-
-# Affichage des pourcentages avec 2 chiffres après la virgule
-print("Pourcentages des bases :")
-print("--------------------------------------------------------")
-
-for base, pourcent in pourcentages.items():
-    print(f"  {base}: {pourcent:.2f}%")
-print("--------------------------------------------------------")
-
-#################
-#Mickael 06/11/24
-#################
-
-def analyse_CIGAR(d_sam):
-    # Initialiser un dictionnaire pour compter les opérations CIGAR
-    comptes_CIGAR = {
-        'M': 0,  # Match (alignement de base)
-        'I': 0,  # Insertion (délétion dans la séquence de référence)
-        'D': 0,  # Deletion (insertion dans la séquence cible)
-        'N': 0,  # Skipping (indication de l'existence d'un intron)
-        'S': 0,  # Soft clipping (bases coupées mais conservées dans le fichier SAM)
-        'H': 0,  # Hard clipping (bases coupées et non enregistrées)
-        'P': 0,  # Padding (espaces réservés dans l'alignement)
-        '=': 0,  # Identique (opérations qui correspondent aux bases de la séquence)
-        'X': 0,  # Mismatch (mismatch entre les bases d'alignement)
-        '*': 0   # Opérations non spécifiées ou indéfinies
-    }
-
-    # Parcourir chaque CIGAR dans le dictionnaire d_sam
-    for read in d_sam.values():
-        CIGAR_d_sam = read["CIGAR"]  # Extraire le CIGAR du dico sam
-
-        iCig = 0  # Initialisation de notre indice pour la chaîne CIGAR
-        
-        while iCig < len(CIGAR_d_sam):
-            # Trouver la taille de l'opération CIGAR
-            jCig = iCig
-            
-            while jCig < len(CIGAR_d_sam) and CIGAR_d_sam[jCig].isdigit(): #Vérifier qu'on sort pas du CIGAR et que l'on traite le nombre d'occurence de l'événement
-                jCig += 1
-       
-            taille_str = CIGAR_d_sam[iCig:jCig]  # Extraction de l'événement
-            
-            if not taille_str:  # Gère nos cas où l'événement est unique dans le CIGAR
-                iCig = jCig + 1  # Passer à l'élément suivant pour éviter une boucle infinie
-                continue  # Passer à la prochaine itération du while principal
-
-            # Vérifier si la taille est un nombre entier valide
-            if taille_str.isdigit():
-                taille = int(taille_str)  # Convertir la taille en entier
-            else:
-                iCig = jCig + 1  # Passer à l'élément suivant si ce n'est pas un nombre valide
-                continue
-
-            operation = CIGAR_d_sam[jCig]  # Extraire l'opération
-
-            comptes_CIGAR[operation] += taille  # Somme des comptes pour l'élément courant cigar
-
-            # Passer à l'élément suivant du CIGAR
-            iCig = jCig + 1
-
-    # Calculer le total des opérations et les pourcentages en une seule étape
-    total_operations = sum(comptes_CIGAR.values())
-
-    # Initialisation du dictionnaire des pourcentages CIGAR
-    pourcentages_CIGAR = {
-        'Alignés match ou mismatch(M)': (comptes_CIGAR['M'] / total_operations * 100) if total_operations > 0 else 0,
-        'Insertions (I)': (comptes_CIGAR['I'] / total_operations * 100) if total_operations > 0 else 0,
-        'Délétions (D)': (comptes_CIGAR['D'] / total_operations * 100) if total_operations > 0 else 0,
-        'Sauts de bases (N)': (comptes_CIGAR['N'] / total_operations * 100) if total_operations > 0 else 0,
-        'Soft Clipping (S)': (comptes_CIGAR['S'] / total_operations * 100) if total_operations > 0 else 0,
-        'Hard Clipping (H)': (comptes_CIGAR['H'] / total_operations * 100) if total_operations > 0 else 0,
-        'Complétion (P)': (comptes_CIGAR['P'] / total_operations * 100) if total_operations > 0 else 0,
-        'base match (=)': (comptes_CIGAR['='] / total_operations * 100) if total_operations > 0 else 0,
-        'bases mismatch (X)': (comptes_CIGAR['X'] / total_operations * 100) if total_operations > 0 else 0,
-        'Événements non spécifiés (*)': (comptes_CIGAR['*'] / total_operations * 100) if total_operations > 0 else 0
-    }
-
-    print("Distribution des données CIGAR pour évaluation de l'alignement")
-    # Afficher les résultats
-    for operation, pourcentage in pourcentages_CIGAR.items():
-        print(f"{operation}: {pourcentage:.3f}%")
-
-    print(f"\nTotal des opérations : {total_operations}")
-    
-#Affichage des informations de d'appariements et FLAG couplés aux informations de distributions des évènements stockés dans les CIGARs ; 
-
-print(analyse_CIGAR(dico_extraction1(fichier_sam)))
+# Affichage des résultats des bases
+data_bases = [(cle, valeur[1], valeur[0], f"{pourcentages[cle]:.2f} %") for cle, valeur in comptes.items()]
 
 
-#----------------------------------------------------------------------------------------#
+t_data_bases = pd.DataFrame(data_bases, columns=["Motif   ", " Nom ", "Valeur absolue    ", "   Valeur relative"])
 
-# Pour HOMERO 07/11 : Ici il faut que l'on fasse un camembert avec maplot lib ou intégrer du code R (ggplot) que ce soit plus rigoureux et adaptés.
-# Ce que je te propose sur la base de ce que j'ai fais pour les CIGARS cette nuit : 
-#   - Je reproduis une structure itérative équivalente pour criblé les lectures et sortir les occurences de chaque base, evènements indel ou autre.   
-#  - Je réfléchis à la manière de représenter les distributions pour CIGAR et les %ATGC dans R avec ggplot
-#   - Je veux bien réfléchir à Jupyternotebook en dernier lieux
+print(" ",Sep,"3. ANALYSE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTIONS RELATIVES  \n",Sep,t_data_bases)
+print(Sep)
 
-# Ouvert a tes autres suggestions si tu veux faire un travail avec un jeu de boucles sur les autres items du dictionnaires qui te parait pertinent pour représenter les données?
-# Pour la partie Pourcentage CIGAR je me suis pas cassé la tete, au début j'avais fait ca avec op pour simplifier la synthaxe du dictionnaire mais c'était pas cohérent donc j'ai modifier les produits en croix et j'ai fais copier coller pour chaque évènement.
+#__________________________________________________________________________________________________________________________________________________________________________________________________________# #                                      4 TRAITEMENT DES FLAGS : TRADUCTION ET DISTRIBUTIONS                                                                                                                #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
 
 
 
-
-
-###################
-# MICKAEL 19/10/2024
-###################
 
 # Dictionnaire qui stocke des bits comme clés et des commentaires comme valeurs
 d_Binary_sam = {
@@ -244,8 +183,6 @@ def decodage_flags(valeur_du_flag):
             l_synthese.append(f"{s_commentaire}")
             
     return l_synthese
-    
-
 
 ####################
 #HOMERO 11/11/2024
@@ -277,11 +214,19 @@ for i_flag in d_flags:
 
 # Conversion du dictionnaire en une liste de tuples [(clé, valeur1, valeur2), ...]
 data = [(cle, valeurs[0], valeurs[1]) for cle, valeurs in d_flags.items()]
-
-# Création du DataFrame avec les colonnes spécifiées
-t_flags = pd.DataFrame(data, columns=['Flag', 'nb de fois présent', 'decodage'])
+t_flags = pd.DataFrame(data, columns=['Flag', 'Occurences', 'Decodage'])
 
 # Affichage du DataFrame
 print(t_flags)
+
+
+    # Écrire les pourcentages dans un fichier CSV
+    #with open("Output_DATA.csv", mode="w", newline="") as file:
+     #   write_CIGAR = csv.writer(file)
+      #  writer.writerow(["Operation", "Pourcentage"])
+       # for operation, pourcentage in pourcentages_CIGAR.items():
+        #    writer.writerow([operation, pourcentage])
+
+    #print("Les pourcentages CIGAR ont été exportés vers pourcentages_CIGAR.csv")
 
 
