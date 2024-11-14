@@ -33,8 +33,7 @@ import re           # Exploitation des regex pour extraire les motifs du CIGAR
 #    },
 #    # etc.
 #}
-import re
-import sys
+
 
 fichier_sam = sys.argv[1]
 Sep = ("-" * 70)+ "\n"
@@ -88,7 +87,6 @@ d_sam = dico_extraction1(fichier_sam)
 #__________________________________________________________________________________________________________________________________________________________________________________________________________#
 #                                      2. TRAITEMENT DES CIGARS : EXTRACTION DES VALEURS ABSOLUES, CALCUL DES SOMMES ET VALEURS RELATIVES (REGEX)                                                          #
 #__________________________________________________________________________________________________________________________________________________________________________________________________________#
-
 # Analyse des CIGAR
 def analyse_CIGAR(d_sam):
     comptes_CIGAR = {
@@ -99,6 +97,7 @@ def analyse_CIGAR(d_sam):
     REGEX_CIGAR = re.compile(r'(\d+)([MIDNSHP=X])')
     TOTAL_OPE_CIG = 0
 
+    # Calcul des sommes pour chaque motif CIGAR
     for read in d_sam.values():
         matches = REGEX_CIGAR.findall(read["CIGAR"])
         for SUM_OPE_CIG_str, OPE_CIG in matches:
@@ -107,18 +106,24 @@ def analyse_CIGAR(d_sam):
                 comptes_CIGAR[OPE_CIG][1] += SUM_OPE_CIG
                 TOTAL_OPE_CIG += SUM_OPE_CIG
 
-    # Calcul des pourcentages
-    for OPE_CIG, (commentaire, count) in comptes_CIGAR.items():
+    # Calcul des pourcentages et mise à jour du dictionnaire
+    for OPE_CIG, (commentaire, count) in comptes_CIGAR.items():	
         pourcentage = (count / TOTAL_OPE_CIG * 100) if TOTAL_OPE_CIG > 0 else 0
-        print(f"{commentaire}: {count} ({pourcentage:.2f}%)")
+        comptes_CIGAR[OPE_CIG].append(pourcentage)  # Ajouter le pourcentage au dictionnaire
 
     return comptes_CIGAR
 
-analyse_CIGAR(d_sam)
+# Analyser les CIGAR
+comptes_CIGAR = analyse_CIGAR(d_sam)
 
+# Construction du Dataframe pour l'affichage dans le terminal.
+Data_cigar = [(f"{cle_CIG}|", f"{Val_CIG[0]} |", f"{Val_CIG[1]} |", f"{Val_CIG[2]:.3f} % |") for cle_CIG, Val_CIG in comptes_CIGAR.items()]
+t_Data_cigar = pd.DataFrame(Data_cigar, columns=["Motif       ", "Nom            ", "Occurences          ", "Valeur relative"])
+
+print(" ", Sep, "2. ANALYSE DES CIGARS : COMPTAGES DES MOTIFS ET DISTRIBUTION RELATIVE \n", Sep, "\n", t_Data_cigar, "\n", )
 
 #__________________________________________________________________________________________________________________________________________________________________________________________________________#
-#                                                                  2. ANALYSE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTIONS RELATIVES                                                                         #
+#                                                                  3. ANALYSE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTIONS RELATIVES                                                                         #
 #__________________________________________________________________________________________________________________________________________________________________________________________________________#
 
 def analyse_SEQ(d_sam):  
@@ -139,49 +144,43 @@ def analyse_SEQ(d_sam):
     
     return comptes_base, PRCT_BASES, total_BASE
 
-
 # Appel de la fonction analyse_SEQ
 comptes, pourcentages, total = analyse_SEQ(d_sam)
 
 # Affichage des résultats des bases
-data_bases = [(cle, valeur[1], valeur[0], f"{pourcentages[cle]:.2f} %") for cle, valeur in comptes.items()]
+data_bases = [(f"{cle} |", f"{Val_SEQ[1]} |", f"{Val_SEQ[0]} |", f"{pourcentages[cle]:.2f} %") for cle, Val_SEQ in comptes.items()]
+t_data_bases = pd.DataFrame(data_bases, columns=["Motif       ", "Nom          ", "Occurences    ", "Valeur relative"])
 
-
-t_data_bases = pd.DataFrame(data_bases, columns=["Motif   ", " Nom ", "Valeur absolue    ", "   Valeur relative"])
-
-print(" ",Sep,"3. ANALYSE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTIONS RELATIVES  \n",Sep,t_data_bases)
-print(Sep)
+print(" ",Sep,"3. ANALYSE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTION RELATIVE  \n",Sep,t_data_bases, "\n") 
 
 #__________________________________________________________________________________________________________________________________________________________________________________________________________# #                                      4 TRAITEMENT DES FLAGS : TRADUCTION ET DISTRIBUTIONS                                                                                                                #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
 
 
 
-
-# Dictionnaire qui stocke des bits comme clés et des commentaires comme valeurs
-d_Binary_sam = {
-    1: "- Read apparié.",
-    2: "- Segment apparié correctement selon les critères de l'aligneur.",
-    4: "- Segment particulier non aligné.",
-    8: "- Segment complémentaire aligné sur le brin négatif.",
-    16: "- Segment aligné sur le brin négatif.",
-    32: "- L'autre read est aligné en réverse sur le brin positif.",
-    64: "- Il s'agit du premier read d'une paire sur le brin positif (5'->3').",
-    128: "- Il s'agit du second read d'une paire sur le brin négatif (5' -> 3').",
-    256: "- Alignement secondaire (non spécifique, alignement multiple).",
-    512: "- Read qui n'a pas passé les filtres de qualité.",
-    1024: "- Duplication due à la PCR ou au processus optique.",
-    2048: "- Alignement supplémentaire (non spécifique, alignement multiple).",
-}
-
 # Fonction pour décoder la valeur d'un flag en affichant les commentaires correspondants
 def decodage_flags(valeur_du_flag):
+# Dictionnaire qui stocke des bits comme clés et des commentaires comme valeurs
+    d_Binary_sam = {
+    	1:    "\u2022 Read apparié.",
+	2:    "\u2022 Segment apparié correctement selon les critères de l'aligneur.",
+	4:    "\u2022 Segment particulier non aligné.",
+	8:    "\u2022 Segment complémentaire aligné sur le brin négatif.",
+	16:   "\u2022 Segment aligné sur le brin négatif.",
+	32:   "\u2022 L'autre read est aligné en réverse sur le brin positif.",
+	64:   "\u2022 Il s'agit du premier read d'une paire sur le brin positif (5'->3').",
+	128:  "\u2022 Il s'agit du second read d'une paire sur le brin négatif (5' -> 3').",
+	256:  "\u2022 Alignement secondaire (non spécifique, alignement multiple).",
+	512:  "\u2022 Read qui n'a pas passé les filtres de qualité.",
+	1024: "\u2022 Duplication due à la PCR ou au processus optique.",
+	2048: "\u2022 Alignement supplémentaire (non spécifique, alignement multiple).",
+	}
     l_synthese = []
 
     # Chaque bit représente un flag spécifique et son commentaire associé :
     for i_bit, s_commentaire in d_Binary_sam.items():
         if valeur_du_flag & i_bit : # En gros ici on vérifie l'activation ou non de chaque bit pour la valeur du flag
             l_synthese.append(f"{s_commentaire}")
-            
+           
     return l_synthese
 
 ####################
@@ -200,8 +199,6 @@ def analyse_flag(d_sam):
             d_flags[flag_d_sam] = 1 #si la clé n'existe pas on la crée et on lui donne la valeur 1
     return d_flags
 
-#print(analyse_flag(d_sam)) # afficher le dictionnaire 
-
 #création d'un  dictionnaire retourner par analyse_flag
 d_flags =analyse_flag(d_sam)
 
@@ -213,12 +210,12 @@ for i_flag in d_flags:
     d_flags[i_flag] = [i_nb_fois_present, l_decodage ] #associe a chaque flag une liste avec le nombre de fois que le flag est present et une liste avec les commentaires correspondant au flag
 
 # Conversion du dictionnaire en une liste de tuples [(clé, valeur1, valeur2), ...]
+
 data = [(cle, valeurs[0], valeurs[1]) for cle, valeurs in d_flags.items()]
 t_flags = pd.DataFrame(data, columns=['Flag', 'Occurences', 'Decodage'])
 
 # Affichage du DataFrame
-print(t_flags)
-
+print(Sep,"4. ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n",Sep,t_flags) 
 
     # Écrire les pourcentages dans un fichier CSV
     #with open("Output_DATA.csv", mode="w", newline="") as file:
