@@ -4,7 +4,7 @@
 **SCORE** : SAM Characterization and Observational Report for Evaluations
 
 ---
-
+## EN COURS DE DEVELOPPEMENT 
 ## Table des matières
 
 1. [Introduction](#introduction)
@@ -16,7 +16,6 @@
 4. [Exécution des scripts](#exécution-des-scripts)
     1. [Fichier `main.sh`](#1-fichier-mainsh)
     2. [Fichier `NGS.py`](#2-fichier-ngspy)
-    3. [Fichier `Translate_FLAG.py`](#3-fichier-translate_flagpy)
 5. [Structure des fichiers](#structure-des-fichiers)
 6. [Auteurs](#auteurs)
 

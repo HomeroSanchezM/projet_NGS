@@ -1,8 +1,6 @@
 import sys          # Pour donner des parametres lors de l'appel de la fonction sur le terminal ou dans un .sh
 import pandas as pd # Pour faire des tableau
-import re           # Exploitation des regex pour extraire les motifs du CIGAR
-
-
+import re           # Exploitation des regex pour extraire les motifs du CIGAR en autre.
 
 # DANS LE README :
 # DIRE CE QUE LE PROGRAMME FAIT
@@ -153,7 +151,7 @@ t_data_bases = pd.DataFrame(data_bases, columns=["Motif       ", "Nom          "
 
 print(" ",Sep,"3. ANALYSE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTION RELATIVE  \n",Sep,t_data_bases, "\n") 
 
-#__________________________________________________________________________________________________________________________________________________________________________________________________________# #                                      4 TRAITEMENT DES FLAGS : TRADUCTION ET DISTRIBUTIONS                                                                                                                #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
+#__________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                           4 TRAITEMENT DES FLAGS : TRADUCTION ET DISTRIBUTIONS                                                                           #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
 
 
 
@@ -205,17 +203,22 @@ d_flags =analyse_flag(d_sam)
 #ajout a ce dictionnaire les commmentaire de decodate_flags
 
 for i_flag in d_flags:
-    l_decodage = decodage_flags(int(i_flag)) #création d'une liste avec les commentaires correspondant a chaque flag 
+    l_decodage = decodage_flags(int(i_flag)), #création d'une liste avec les commentaires correspondant a chaque flag 
     i_nb_fois_present = d_flags[i_flag] #recupere la valeur du nombre de flag present associe a chaque flag 
-    d_flags[i_flag] = [i_nb_fois_present, l_decodage ] #associe a chaque flag une liste avec le nombre de fois que le flag est present et une liste avec les commentaires correspondant au flag
+    d_flags[i_flag] = [i_nb_fois_present, l_decodage,  ] #associe a chaque flag une liste avec le nombre de fois que le flag est present et une liste avec les commentaires correspondant au flag
 
 # Conversion du dictionnaire en une liste de tuples [(clé, valeur1, valeur2), ...]
 
 data = [(cle, valeurs[0], valeurs[1]) for cle, valeurs in d_flags.items()]
-t_flags = pd.DataFrame(data, columns=['Flag', 'Occurences', 'Decodage'])
+t_flags = pd.DataFrame(data, columns=["Flag", "Occurences", "Decodage"])
 
-# Affichage du DataFrame
+
 print(Sep,"4. ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n",Sep,t_flags) 
+#__________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                                       5 TRAITEMENT DES SCORES : ???                                                                                      #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
+
+#__________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                             6 TRAITEMENT DES POSITIONS CHROMOSOMIQUES  : ???                                                                             #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
+
+#__________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                       7 STOCKAGE DES OUTPUTS SOUS CSV POUR TRAITEMENT STATISTIQUES                                                                       #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
 
     # Écrire les pourcentages dans un fichier CSV
     #with open("Output_DATA.csv", mode="w", newline="") as file:
