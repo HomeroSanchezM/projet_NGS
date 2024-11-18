@@ -160,7 +160,7 @@ def decodage_flags(valeur_du_flag):
 # Dictionnaire qui stocke des bits comme clés et des commentaires comme valeurs
     d_Binary_sam = {
     	1:    "\u2022 Read apparié.",
-	2:    "\u2022 Segment apparié correctement selon les critères de l'aligneur.",
+	2:    "\u2022 Segment apparié correctement selon les critères de l'aligneur. \n",
 	4:    "\u2022 Segment particulier non aligné.",
 	8:    "\u2022 Segment complémentaire aligné sur le brin négatif.",
 	16:   "\u2022 Segment aligné sur le brin négatif.",
@@ -209,9 +209,8 @@ for i_flag in d_flags:
 
 # Conversion du dictionnaire en une liste de tuples [(clé, valeur1, valeur2), ...]
 
-data = [(cle, valeurs[0], valeurs[1]) for cle, valeurs in d_flags.items()]
-t_flags = pd.DataFrame(data, columns=["Flag", "Occurences", "Decodage"])
-
+data = [(f"{cle}  |", f"{valeurs[0]} |", f"{valeurs[1]}  |") for cle, valeurs in d_flags.items()]
+t_flags = pd.DataFrame(data, columns=["Flag    ", "Occurences       ", "Decodage"])
 
 print(Sep,"4. ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n",Sep,t_flags) 
 #__________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                                       5 TRAITEMENT DES SCORES : ???                                                                                      #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
