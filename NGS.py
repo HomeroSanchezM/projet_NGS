@@ -276,11 +276,12 @@ read_aligné_paire_non = 0
 for i_flag in d_flags:
     if "B" in d_flags[i_flag][1]: #si read aligné
         read_aligné+=d_flags[i_flag][0]
-    if ("C" in d_flags[i_flag][1]) and ("D" in d_flags[i_flag][1]): #si read non aligné
+    if ("C" in d_flags[i_flag][1]) : #si read non aligné
         read_non_aligné+=d_flags[i_flag][0]
     if ("B" in d_flags[i_flag][1]) and ("D" in d_flags[i_flag][1]): #nombre de read aligné avec la paire non aligné
         read_aligné_paire_non+=d_flags[i_flag][0]   
 
+print ("single read:", "\n")
 
 print("\u2022 read mappés", "\n")
 print ("nombre de reads apparié correctement selon les critères de l'aligneur : ", read_aligné)
@@ -293,3 +294,28 @@ print ("pourcentage de read correctement apparié : ",format((read_non_aligné/l
 print("\u2022 les paires de reads où un seul read de la paire est entierement mappé et l’autre non mappé", "\n")
 print("nombre de read aligné avec la paire non aligné",read_aligné_paire_non )
 print("pourcentage de read correctement apparié : ",format((read_aligné_paire_non/len(d_sam))*100, '.3f')," %", "\n")
+
+print("pair read", "\n")
+
+
+
+print(Sep,"5. ANALYSE DE LA QUALITÉ DE MAPPING\n",Sep, "\n")
+
+def analyse_qualité(d_sam):  
+    d_qual = {}
+    for read in d_sam.values():
+        qual_d_sam = read["MAPQ"]
+        
+        if qual_d_sam in d_qual: #verifie si une clé est déja dans le dictionnaire
+            d_qual[qual_d_sam] += 1 #si elle exite deja, on l'incremente de 1
+        else:
+            d_qual[qual_d_sam] = 1 #si la clé n'existe pas on la crée et on lui donne la valeur 1
+    return d_qual
+
+
+d_qual = analyse_qualité(d_sam)
+
+data = [(f"{cle}  |", f"{valeurs} |") for cle, valeurs in d_qual.items()]
+t_qual = pd.DataFrame(data, columns=["Qualité    ", "Occurences       "])
+
+print(t_qual)
