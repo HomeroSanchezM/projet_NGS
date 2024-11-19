@@ -229,17 +229,26 @@ print(Sep,"4. ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n",Sep,"différent c
 #__________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                                       5 TRAITEMENT DES SCORES : ???                                                                                      #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
 
 #__________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                             6 TRAITEMENT DES POSITIONS CHROMOSOMIQUES  : ???                                                                             #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
+def analyse_Dpos(d_pos):
+    d_posD = {}
+    for read in d_pos.values():
+        POS = read["POS"]
+        if POS in d_posD:
+            d_posD[POS] += 1
+        else:
+            d_posD[POS] = 1
+            
+    return d_posD
 
-#__________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                       7 STOCKAGE DES OUTPUTS SOUS CSV POUR TRAITEMENT STATISTIQUES                                                                       #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
+print(f"nombre de positions : {len(analyse_Dpos(d_sam))}")
 
-    # Écrire les pourcentages dans un fichier CSV
-    #with open("Output_DATA.csv", mode="w", newline="") as file:
-     #   write_CIGAR = csv.writer(file)
-      #  writer.writerow(["Operation", "Pourcentage"])
-       # for operation, pourcentage in pourcentages_CIGAR.items():
-        #    writer.writerow([operation, pourcentage])
+d_posD = analyse_Dpos(d_sam)
 
-    #print("Les pourcentages CIGAR ont été exportés vers pourcentages_CIGAR.csv")
+Data_pos = [(f"{cle}   |",f"{val}   |") for cle, val in d_posD.items()]
+t_Data_pos = pd.DataFrame(Data_pos, columns=["Position de départ","Nombre de reads"])
+
+print(" ",Sep,"6. DISTRIBUTIONS DES READS PAR POSITIONS DE DEPART  \n",Sep,t_Data_pos, "\n") 
+
 
 
 ######################
