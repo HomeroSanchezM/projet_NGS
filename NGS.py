@@ -207,7 +207,7 @@ for i_flag in d_flags:
     i_nb_fois_present = d_flags[i_flag] #recupere la valeur du nombre de flag present associe a chaque flag 
     d_flags[i_flag] = [i_nb_fois_present, l_decodage] #associe a chaque flag une liste avec le nombre de fois que le flag est present et une liste avec les commentaires correspondant au flag
 
-print(d_flags)
+
 # Conversion du dictionnaire en une liste de tuples [(clé, valeur1, valeur2), ...]
 
 data = [(f"{cle}  |", f"{valeurs[0]} |", f"{valeurs[1]}  |") for cle, valeurs in d_flags.items()]
@@ -215,11 +215,11 @@ t_flags = pd.DataFrame(data, columns=["Flag    ", "Occurences       ", "Decodage
 
 print(Sep,"4. ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n",Sep,"différent commentaires possibles: \n",
     "\u2022 A: Read apparié.\n",
-    "\u2022 B: Segment apparié correctement selon les critères de l'aligneur. \n",
-	 "\u2022 C: Segment particulier non aligné. \n",
-	"\u2022 D: Segment complémentaire aligné sur le brin négatif. \n",
+    "\u2022 B: Segments appariés correctement selon les critères de l'aligneur. \n",
+	 "\u2022C: Segment particulier non aligné. \n",
+	"\u2022 D: Segment complémentaire non aligné sur le brin négatif. \n",
 	"\u2022 E: Segment aligné sur le brin négatif.\n",
-	"\u2022 F: L'autre read est aligné en réverse sur le brin positif.\n",
+	"\u2022 F: L'autre read est aligné en réverse sur le brin négatif.\n",
 	"\u2022 G: Il s'agit du premier read d'une paire sur le brin positif (5'->3').\n",
 	"\u2022 H: Il s'agit du second read d'une paire sur le brin négatif (5' -> 3').\n",
 	"\u2022 I: Alignement secondaire (non spécifique, alignement multiple).\n",
@@ -246,16 +246,35 @@ print(Sep,"4. ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n",Sep,"différent c
 #HOMERO 19/11/2024
 #####################
 
+print(Sep,"5. ANALYSE DES ALIGNEMENT \n",Sep, "\n")
+
+
 #on donne le nombre de read total
 
-print ("nombre de reads : " , len(d_sam))
+print ("nombre de reads : " , len(d_sam), "\n")
+
 #on donne le pourcentage de read correctement apparié
 
 read_aligné = 0
+read_non_aligné = 0
+read_aligné_paire_non = 0
 for i_flag in d_flags:
-    if "B" in d_flags[i_flag][1]:
+    if "B" in d_flags[i_flag][1]: #si read aligné
         read_aligné+=d_flags[i_flag][0]
+    if ("C" in d_flags[i_flag][1]) and ("D" in d_flags[i_flag][1]): #si read non aligné
+        read_non_aligné+=d_flags[i_flag][0]
+    if ("B" in d_flags[i_flag][1]) and ("D" in d_flags[i_flag][1]): #nombre de read aligné avec la paire non aligné
+        read_aligné_paire_non+=d_flags[i_flag][0]   
+
+
+print("\u2022 read mappés", "\n")
 print ("nombre de reads apparié correctement selon les critères de l'aligneur : ", read_aligné)
-print ("pourcentage de read correctement apparié : ",(read_aligné/len(d_sam))*100)
-#"- Segment apparié correctement selon les critères de l'aligneur."
-print (d_flags[i_flag][1])
+print ("pourcentage de read correctement apparié : ",format((read_aligné/len(d_sam))*100,'.3f')," %", "\n")
+
+print("\u2022 read non mappés", "\n")
+print ("nombre de reads non aligné : ", read_non_aligné)
+print ("pourcentage de read correctement apparié : ",format((read_non_aligné/len(d_sam))*100,'.3f')," %", "\n")
+
+print("\u2022 les paires de reads où un seul read de la paire est entierement mappé et l’autre non mappé", "\n")
+print("nombre de read aligné avec la paire non aligné",read_aligné_paire_non )
+print("pourcentage de read correctement apparié : ",format((read_aligné_paire_non/len(d_sam))*100, '.3f')," %", "\n")
