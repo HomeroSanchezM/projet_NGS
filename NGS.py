@@ -1,6 +1,7 @@
 import sys          # Pour donner des parametres lors de l'appel de la fonction sur le terminal ou dans un .sh
 import pandas as pd # Pour faire des tableau
 import re           # Exploitation des regex pour extraire les motifs du CIGAR en autre.
+import matplotlib.pyplot as plt # Pour faire des représentation graphiques des Outputs
 
 # DANS LE README :
 # DIRE CE QUE LE PROGRAMME FAIT
@@ -249,6 +250,11 @@ t_Data_pos = pd.DataFrame(Data_pos, columns=["Position de départ","Nombre de re
 
 print(" ",Sep,"6. DISTRIBUTIONS DES READS PAR POSITIONS DE DEPART  \n",Sep,t_Data_pos, "\n") 
 
+plt.bar(d_posD.keys(), d_posD.values(), color='g')
+plt.xlabel('Positions de départ')
+plt.ylabel('Nombre de reads')
+plt.title('Distribution des reads par position de départ')
+plt.show()
 
 
 ######################
