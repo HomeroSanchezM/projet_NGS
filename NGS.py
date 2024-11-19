@@ -159,25 +159,25 @@ print(" ",Sep,"3. ANALYSE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTION RELATIVE  \n
 def decodage_flags(valeur_du_flag):
 # Dictionnaire qui stocke des bits comme clés et des commentaires comme valeurs
     d_Binary_sam = {
-    	1:    "\u2022 Read apparié.",
-	2:    "\u2022 Segment apparié correctement selon les critères de l'aligneur. \n",
-	4:    "\u2022 Segment particulier non aligné.",
-	8:    "\u2022 Segment complémentaire aligné sur le brin négatif.",
-	16:   "\u2022 Segment aligné sur le brin négatif.",
-	32:   "\u2022 L'autre read est aligné en réverse sur le brin positif.",
-	64:   "\u2022 Il s'agit du premier read d'une paire sur le brin positif (5'->3').",
-	128:  "\u2022 Il s'agit du second read d'une paire sur le brin négatif (5' -> 3').",
-	256:  "\u2022 Alignement secondaire (non spécifique, alignement multiple).",
-	512:  "\u2022 Read qui n'a pas passé les filtres de qualité.",
-	1024: "\u2022 Duplication due à la PCR ou au processus optique.",
-	2048: "\u2022 Alignement supplémentaire (non spécifique, alignement multiple).",
+    1:    "A", #Read apparié.
+	2:    "B", #Segment apparié correctement selon les critères de l'aligneur.
+	4:    "C", #Segment particulier non aligné
+	8:    "D", #Segment complémentaire aligné sur le brin négatif.
+	16:   "E", #Segment aligné sur le brin négatif.
+	32:   "F", #L'autre read est aligné en réverse sur le brin positif.
+	64:   "G", #Il s'agit du premier read d'une paire sur le brin positif (5'->3').
+	128:  "H", #Il s'agit du second read d'une paire sur le brin négatif (5' -> 3').
+	256:  "I", #Alignement secondaire (non spécifique, alignement multiple).\n"
+	512:  "J", #Read qui n'a pas passé les filtres de qualité.
+	1024: "K", #Duplication due à la PCR ou au processus optique.
+	2048: "L" #Alignement supplémentaire (non spécifique, alignement multiple).
 	}
     l_synthese = []
 
     # Chaque bit représente un flag spécifique et son commentaire associé :
     for i_bit, s_commentaire in d_Binary_sam.items():
         if valeur_du_flag & i_bit : # En gros ici on vérifie l'activation ou non de chaque bit pour la valeur du flag
-            l_synthese.append(f"{s_commentaire}")
+            l_synthese.append(s_commentaire)
            
     return l_synthese
 
@@ -203,16 +203,29 @@ d_flags =analyse_flag(d_sam)
 #ajout a ce dictionnaire les commmentaire de decodate_flags
 
 for i_flag in d_flags:
-    l_decodage = decodage_flags(int(i_flag)), #création d'une liste avec les commentaires correspondant a chaque flag 
+    l_decodage = decodage_flags(int(i_flag)) #création d'une liste avec les commentaires correspondant a chaque flag 
     i_nb_fois_present = d_flags[i_flag] #recupere la valeur du nombre de flag present associe a chaque flag 
-    d_flags[i_flag] = [i_nb_fois_present, l_decodage,  ] #associe a chaque flag une liste avec le nombre de fois que le flag est present et une liste avec les commentaires correspondant au flag
+    d_flags[i_flag] = [i_nb_fois_present, l_decodage] #associe a chaque flag une liste avec le nombre de fois que le flag est present et une liste avec les commentaires correspondant au flag
 
+print(d_flags)
 # Conversion du dictionnaire en une liste de tuples [(clé, valeur1, valeur2), ...]
 
 data = [(f"{cle}  |", f"{valeurs[0]} |", f"{valeurs[1]}  |") for cle, valeurs in d_flags.items()]
 t_flags = pd.DataFrame(data, columns=["Flag    ", "Occurences       ", "Decodage"])
 
-print(Sep,"4. ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n",Sep,t_flags) 
+print(Sep,"4. ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n",Sep,"différent commentaires possibles: \n",
+    "\u2022 A: Read apparié.\n",
+    "\u2022 B: Segment apparié correctement selon les critères de l'aligneur. \n",
+	 "\u2022 C: Segment particulier non aligné. \n",
+	"\u2022 D: Segment complémentaire aligné sur le brin négatif. \n",
+	"\u2022 E: Segment aligné sur le brin négatif.\n",
+	"\u2022 F: L'autre read est aligné en réverse sur le brin positif.\n",
+	"\u2022 G: Il s'agit du premier read d'une paire sur le brin positif (5'->3').\n",
+	"\u2022 H: Il s'agit du second read d'une paire sur le brin négatif (5' -> 3').\n",
+	"\u2022 I: Alignement secondaire (non spécifique, alignement multiple).\n",
+	"\u2022 J: Read qui n'a pas passé les filtres de qualité.\n",
+	"\u2022 K: Duplication due à la PCR ou au processus optique.\n",
+	"\u2022 L: Alignement supplémentaire (non spécifique, alignement multiple).\n","\n",t_flags) 
 #__________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                                       5 TRAITEMENT DES SCORES : ???                                                                                      #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
 
 #__________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                             6 TRAITEMENT DES POSITIONS CHROMOSOMIQUES  : ???                                                                             #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
@@ -229,3 +242,20 @@ print(Sep,"4. ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n",Sep,t_flags)
     #print("Les pourcentages CIGAR ont été exportés vers pourcentages_CIGAR.csv")
 
 
+######################
+#HOMERO 19/11/2024
+#####################
+
+#on donne le nombre de read total
+
+print ("nombre de reads : " , len(d_sam))
+#on donne le pourcentage de read correctement apparié
+
+read_aligné = 0
+for i_flag in d_flags:
+    if "B" in d_flags[i_flag][1]:
+        read_aligné+=d_flags[i_flag][0]
+print ("nombre de reads apparié correctement selon les critères de l'aligneur : ", read_aligné)
+print ("pourcentage de read correctement apparié : ",(read_aligné/len(d_sam))*100)
+#"- Segment apparié correctement selon les critères de l'aligneur."
+print (d_flags[i_flag][1])
