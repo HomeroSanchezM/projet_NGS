@@ -28,21 +28,33 @@ else
     # Si toutes les conditions sont satisfaites, on exécute notre Script Python
     debNGSpy=$(date +%s) 
    
-    echo -e "\nNos contrôles préliminaires sont terminés, création du rapport de sortie au format csv ... \n"
+    echo -e "\nNos contrôles préliminaires sont terminés, début du traitement : \n"
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------#
 # Création d'un Output format .csv avec une dénomination qui va gérer les éxecutions successives du programme pour éviter l'écrasement de l'output n-1  #
 # ----------------------------------------------------------------------------------------------------------------------------------------------------- #
 # Définir le nom du fichier de sortie avec la date :
-Output_CSV="Output_DATA_$(date +"%Y%m%d").csv"
+#Output_CSV="Output_DATA_$(date +"%Y%m%d").csv"
 
 # Créer le fichier avec la première ligne d'en-tête
-echo "Fichier d'extraction des métriques SAM : " > "$Output_CSV"
+#echo "Fichier d'extraction des métriques SAM : " > "$Output_CSV"
 
+#-------------------------------------- #
+# Gestion des options en arguments      #
+#-------------------------------------- #
+  # Extraction des options supplémentaires
+    options="${@:2}" # Tous les arguments après le premier ($1 est le fichier SAM)
+
+    # Gestion des options si on ne veut pas lancer l'intégralité de l'analyse : 
+    if [ -z "$options" ]; then
+        echo "Aucune option spécifique fournie, toutes les analyses seront effectuées par défaut."
+        python3 "$Script1" "$1" --all
+    else
+        echo "Options spécifiées : $options"
+        python3 "$Script1" "$1" $options
+    fi
     
-    # On lance NGS.py pour repérer les FLAGS présents et compter leurs occurrences.
-    python3 "$Script1" "$1"
-    
+
     if [ $? -ne 0 ]; then 
         echo "Erreur lors de l'extraction des flags et du comptage des occurrences, vérifier le script_1 ou si le nom du fichier n'est pas modifié."
         exit 1
