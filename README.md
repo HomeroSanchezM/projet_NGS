@@ -31,7 +31,7 @@ Ce projet a pour but d'analyser et de caractériser les fichiers **SAM (Sequence
 
 Avant de pouvoir exécuter ce projet, vous devez disposer de certains outils et programmes installés sur votre machine.
 
-- **Python 3.x** : Utilisé pour exécuter les scripts.
+- **Python 3.6** : Utilisé pour exécuter les scripts.
 - **Pip** : Pour gérer les dépendances Python.
 - **Système Linux ou similaire** : Ce projet est conçu pour fonctionner sous Linux.
 
@@ -39,15 +39,7 @@ Avant de pouvoir exécuter ce projet, vous devez disposer de certains outils et 
 
 ## Installation et configuration
 
-### 1. Créer un environnement virtuel
 
-L'utilisation d'un environnement virtuel est essentielle pour isoler les dépendances spécifiques à ce projet. Cela vous permet de ne pas interférer avec d'autres projets ou les versions des bibliothèques installées sur votre système.
-
-#### 1.1. Créer un environnement virtuel
-
-Avant de créer un environnement virtuel, assurez-vous d'être dans le répertoire de votre projet. Si vous n'êtes pas dans le bon répertoire, utilisez la commande `cd` pour vous y rendre.
-
-```bash
 cd ~/projet
 
 python3 -m venv SCORE_PROGRAMME
