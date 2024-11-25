@@ -49,7 +49,7 @@ Le programme utilise les packages suivant:
 - **re**
   
 Afin de télécharger automatiquement les packages on a inclut un fichier requirement.txt, afin de lexecuter vous dever saisir la ligne de code suivante :  
-``
+```
 pip install -r requirements.txt 
 ```
 
