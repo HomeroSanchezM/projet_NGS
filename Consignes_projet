@@ -30,11 +30,5 @@
 # En sortie je veux savoir combien de ligne ont le flag 99, puis O, puis 128 ...
 # flag complémentaire, combien de reads mappés ?
 
-IDEES EN VRAC :
-# TOOLBAR !!!!
-# JUPYTER
-# Propose moi des idées pour rendre innovant ce petit programme:
-# Un graphique pour représenter la densité de mapping des reads sur les chromosomes.
-# Un graphique pour représenter la qualité des reads mappés.
-# Un graphique pour représenter la qualité des reads mappés en fonction de leur position sur le génome.
-# Faire un script bash qui appelle le script python.
+
+

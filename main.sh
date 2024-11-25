@@ -2,7 +2,7 @@
 
 ###########################################################################################################################################################################################################
 #                                                                          COQUERELLE MICKAEL - HOMERO SANCHEZ 18.10.2024                                                                                #      
-#			        		               --  SCORE : SAM Characterization and Observational Report for Evaluations  --                                                              
+#			        		               --  SCORE : SAM file Characterization and Observational Report for Evaluation  --                                                              
 ###########################################################################################################################################################################################################
 
 sep="--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
@@ -30,15 +30,6 @@ else
    
     echo -e "\nNos contrôles préliminaires sont terminés, début du traitement : \n"
 
-# ------------------------------------------------------------------------------------------------------------------------------------------------------#
-# Création d'un Output format .csv avec une dénomination qui va gérer les éxecutions successives du programme pour éviter l'écrasement de l'output n-1  #
-# ----------------------------------------------------------------------------------------------------------------------------------------------------- #
-# Définir le nom du fichier de sortie avec la date :
-#Output_CSV="Output_DATA_$(date +"%Y%m%d").csv"
-
-# Créer le fichier avec la première ligne d'en-tête
-#echo "Fichier d'extraction des métriques SAM : " > "$Output_CSV"
-
 #-------------------------------------- #
 # Gestion des options en arguments      #
 #-------------------------------------- #
@@ -56,7 +47,7 @@ else
     
 
     if [ $? -ne 0 ]; then 
-        echo "Erreur lors de l'extraction des flags et du comptage des occurrences, vérifier le script_1 ou si le nom du fichier n'est pas modifié."
+        echo "Erreur lors de l'extraction des flags et du comptage des occurrences, faire une vérification du nom et du contenu du script python"
         exit 1
     else 
         echo -e "\nExtractions des Flags et comptages des occurrences effectués avec succès\n"
@@ -65,7 +56,7 @@ else
     echo -e "\n$sep"
     # Affichage du temps de traitement
     endNGSpy=$(date +%s) 
-    echo -e "\nTemps de traitement : $((endNGSpy - debNGSpy)) secondes"
-   
+ 
+    echo -e "\nTemps de traitement : $((endNGSpy - debNGSpy)) secondes"   
 fi
 

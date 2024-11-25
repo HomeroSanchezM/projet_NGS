@@ -126,7 +126,7 @@ t_Data_cigar = pd.DataFrame(Data_cigar,
 
 
 # __________________________________________________________________________________________________________________________________________________________________________________________________________#
-#                                                                  3. ANALYSE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTIONS RELATIVES                                                                         #
+#                                                            3. FREQUENCE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTIONS RELATIVES DU FICHIER                                                                    
 # __________________________________________________________________________________________________________________________________________________________________________________________________________#
 
 def analyse_SEQ(d_sam):
@@ -291,15 +291,13 @@ parser.add_argument("--ali", action="store_true", help="Analyse de l'appariement
 parser.add_argument("--qual", action="store_true", help="Analyse de la qualité de l'alignement")
 args = parser.parse_args()
 
-
 # On définit la structure conditionnelle pour réaliser l'intégralité des analyses si pas d'arguments renseignés. Sinon, on exécute les analyses demandées :
 
 if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual]):
     print("Rapport intégrale de l'analyse du fichier SAM : \n")
     print(" ", Sep, "1. CREATION DU DICTIONNAIRE PRINCIPAL : EXTRACTIONS DES ELEMENTS TABULES DU FICHIER SAM ")
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
-    print(" ", Sep, "2. ANALYSE DES CIGARS : COMPTAGES DES MOTIFS ET DISTRIBUTION RELATIVE \n", Sep, "\n", t_Data_cigar,
-          "\n", )
+    print(" ", Sep, "2. ANALYSE DES CIGARS : COMPTAGES DES MOTIFS ET DISTRIBUTION RELATIVE \n", Sep, "\n", t_Data_cigar, "\n", )
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
     print(" ", Sep, "3. ANALYSE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTION RELATIVE  \n", Sep, t_data_bases, "\n")
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
