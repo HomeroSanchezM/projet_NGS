@@ -24,6 +24,7 @@
 ## Introduction
 
 This project aims to analyze and characterize **SAM (Sequence Alignment/Map)** files. It allows you to extract, for example, detailed information on the flags present in a SAM file, to count their occurrence and to produce a report in the form of a table, observing the different characteristics of the data.
+
 ---
 
 ## Prerequisites
@@ -58,6 +59,33 @@ pip install -r requirements.txt
 The project is adapted for the analisis of SAM files containing aligned DNA sequence reads. During the execution, the SAM file is the only Imput needed and have to be add to the same folder that contain the project's files. For more information ot the SAM format, please read the documentation **descriptive_sam.pdf** of the project. 
 
 ## Script execution
+
+### Complete execution
+
+Here you have an example of execution using a SAM file present in the project files that will execute the complete analysis of the SAM, you need to be in the same folder that the project files and enter the following line of code in your terminal:
+
+```
+./main.sh mapping.sam
+``` 
+
+### execution with options
+
+The program have differents options that allow the user to only extract the information needed, the options are:
+
+**--all** : analysis of all 
+**--cigar** : analysis of the cigar information 
+**--base** : percentage of different bases
+**--flag** : analysis of the flags
+**--pos** : 
+**--ali** :
+**--qual** : 
+
+
+the list of options is avalable with the folowing line of code: 
+
+```
+./main.sh mapping.sam --help
+```
 
 
 
