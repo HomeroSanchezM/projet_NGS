@@ -23,7 +23,7 @@
 
 ## Introduction
 
-Ce projet a pour but d'analyser et de caractériser les fichiers **SAM (Sequence Alignment/Map)**. Il permet d'extraire par exemple des informations détaillées sur les flags présents dans un fichier SAM, de compter leur occurrence et de produire un rapport observant les différentes caractéristiques des données.
+Ce projet a pour but d'analyser et de caractériser les fichiers **SAM (Sequence Alignment/Map)**. Il permet d'extraire par exemple des informations détaillées sur les flags présents dans un fichier SAM, de compter leur occurrence et de produire un rapport sous la forme d'un tableau, observant les différentes caractéristiques des données.
 
 ---
 
@@ -38,9 +38,18 @@ Avant de pouvoir exécuter ce projet, vous devez disposer de certains outils et 
 ---
 
 ## Installation et configuration
-
-
-cd ~/projet
-
-python3 -m venv SCORE_PROGRAMME
+Pour installer l'ensemble des fichier du notre projet vous dever saisir le ligne de code suivante dans votre terminal: 
+```
+git clone https://github.com/HomeroSanchezM/projet_NGS.git 
+```
+Le programme utilise les packages suivant:
+- **panda**
+- **pars**
+- **os**
+- **re**
+  
+Afin de télécharger automatiquement les packages on a inclut un fichier requirement.txt, afin de lexecuter vous dever saisir la ligne de code suivante :  
+```
+pip install -r requirements.txt 
+```
 

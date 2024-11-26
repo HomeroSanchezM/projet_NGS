@@ -15,7 +15,8 @@ import argparse  # Pour gérer le système d'options en argument dans bash.
 
 # DICOEXTRACTION1
 # {
-#    "QNAME1": {
+#    "ID_LIGNE1": {
+#        "QNAME": QNAME1,
 #        "FLAG": FLAG1,
 #        "RNAME": RNAME1,
 #        "POS": POS1,
@@ -27,7 +28,8 @@ import argparse  # Pour gérer le système d'options en argument dans bash.
 #        "SEQ": SEQ1,
 #        "QUAL": QUAL1
 #    },
-#    "QNAME2": {
+#    "ID_LIGNE2": {
+#        "QNAME": QNAME2,
 #        "FLAG": FLAG2,
 #        "RNAME": RNAME2,
 #        # etc.
@@ -157,6 +159,8 @@ data_bases = [(f"{cle} |", f"{Val_SEQ[1]} |", f"{Val_SEQ[0]} |", f"{pourcentages
 t_data_bases = pd.DataFrame(data_bases, columns=["Motif       ", "Nom          ", "Occurences    ", "Valeur relative"])
 
 
+# __________________________________________________________________________________________________________________________________________________________________________________________________________#
+#                                                            4. ANALYSE DE FLAG: DECODAGE ET  COMTAGE                                                                     
 # __________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                           4 TRAITEMENT DES FLAGS : TRADUCTION ET DISTRIBUTIONS                                                                           #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
 # Fonction pour décoder la valeur d'un flag en affichant les commentaires correspondants
 
@@ -166,9 +170,9 @@ def decodage_flags(valeur_du_flag):
         1: "A",  # Read apparié.
         2: "B",  # Segment apparié correctement selon les critères de l'aligneur.
         4: "C",  # Segment particulier non aligné
-        8: "D",  # Segment complémentaire aligné sur le brin négatif.
-        16: "E",  # Segment aligné sur le brin négatif.
-        32: "F",  # L'autre read est aligné en réverse sur le brin positif.
+        8: "D",  # Segment complémentaire non aligné 
+        16: "E",  # Segment est reverse complement
+        32: "F",  # Segment complementaire est reverse complement
         64: "G",  # Il s'agit du premier read d'une paire sur le brin positif (5'->3').
         128: "H",  # Il s'agit du second read d'une paire sur le brin négatif (5' -> 3').
         256: "I",  # Alignement secondaire (non spécifique, alignement multiple).\n"
@@ -215,7 +219,8 @@ for i_flag in d_flags:
 data = [(f"{cle}  |", f"{valeurs[0]} |", f"{valeurs[1]}  |") for cle, valeurs in d_flags.items()]
 t_flags = pd.DataFrame(data, columns=["Flag    ", "Occurences       ", "Decodage"])
 
-
+# __________________________________________________________________________________________________________________________________________________________________________________________________________#
+#                                                            5. DISTRIBUTIONS DES READS PAR POSITIONS DE DEPART                                                                   
 # __________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                             5 TRAITEMENT DES POSITIONS CHROMOSOMIQUES :                                                                             #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
 def analyse_Dpos(d_pos):
     d_posD = {}
@@ -242,13 +247,17 @@ t_Data_pos = pd.DataFrame(Data_pos, columns=["Position de départ", "Nombre de r
 # plt.title('Distribution des reads par position de départ')
 # plt.show()
 
-
+# __________________________________________________________________________________________________________________________________________________________________________________________________________#
+#                                                            6.   ANALYSE DE L'ALIGNEMENT                                                                
 # __________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                                       6  A DEFINIR PAR HOMERO                                                                                            #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
 
 # on donne le pourcentage de read correctement apparié
+#signle read
 read_aligné = 0
 read_non_aligné = 0
+#pair read
 read_aligné_paire_non = 0
+
 for i_flag in d_flags:
     if "B" in d_flags[i_flag][1]:  # si read aligné
         read_aligné += d_flags[i_flag][0]
@@ -257,7 +266,15 @@ for i_flag in d_flags:
     if ("B" in d_flags[i_flag][1]) and ("D" in d_flags[i_flag][1]):  # nombre de read aligné avec la paire non aligné
         read_aligné_paire_non += d_flags[i_flag][0]
 
+<<<<<<< HEAD
 # __________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                          7. TRAITEMENT DE LA QUALITE DE MAPPING                                                                                           #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
+=======
+
+
+# __________________________________________________________________________________________________________________________________________________________________________________________________________#
+#                                                            7. ANALYSE DE LA QUALITÉ DE MAPPING                                                           
+#  __________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                          7. TRAITEMENT DE LA QUALITE DE MAPPING                                                                                           #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
+>>>>>>> refs/remotes/origin/main
 
 
 def analyse_qualité(d_sam):
@@ -306,8 +323,8 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual]):
           "\u2022 B: Segments appariés correctement selon les critères de l'aligneur. \n",
           "\u2022C: Segment particulier non aligné. \n",
           "\u2022 D: Segment complémentaire non aligné sur le brin négatif. \n",
-          "\u2022 E: Segment aligné sur le brin négatif.\n",
-          "\u2022 F: L'autre read est aligné en réverse sur le brin négatif.\n",
+          "\u2022 E: Segment est reverse complement.\n",
+          "\u2022 F: Segment complementaire est reverse complement.\n",
           "\u2022 G: Il s'agit du premier read d'une paire sur le brin positif (5'->3').\n",
           "\u2022 H: Il s'agit du second read d'une paire sur le brin négatif (5' -> 3').\n",
           "\u2022 I: Alignement secondaire (non spécifique, alignement multiple).\n",
@@ -330,6 +347,7 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual]):
     print("nombre de reads non aligné : ", read_non_aligné)
     print("pourcentage de read correctement apparié : ", format((read_non_aligné / len(d_sam)) * 100, '.3f'), " %",
           "\n")
+    print("pair read", "\n")
 
     print("\u2022 les paires de reads où un seul read de la paire est entierement mappé et l’autre non mappé", "\n")
     print("nombre de read aligné avec la paire non aligné", read_aligné_paire_non)
@@ -337,7 +355,7 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual]):
           " %",
           "\n")
 
-    print("pair read", "\n")
+    
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
     print(Sep, "7. ANALYSE DE LA QUALITÉ DE MAPPING\n", Sep, "\n",t_qual)
 
@@ -352,8 +370,8 @@ elif args.flag :
           "\u2022 B: Segments appariés correctement selon les critères de l'aligneur. \n",
           "\u2022C: Segment particulier non aligné. \n",
           "\u2022 D: Segment complémentaire non aligné sur le brin négatif. \n",
-          "\u2022 E: Segment aligné sur le brin négatif.\n",
-          "\u2022 F: L'autre read est aligné en réverse sur le brin négatif.\n",
+          "\u2022 E: Segment est reverse complement.\n",
+          "\u2022 F: Segment complementaire est reverse complement.\n",
           "\u2022 G: Il s'agit du premier read d'une paire sur le brin positif (5'->3').\n",
           "\u2022 H: Il s'agit du second read d'une paire sur le brin négatif (5' -> 3').\n",
           "\u2022 I: Alignement secondaire (non spécifique, alignement multiple).\n",
@@ -376,18 +394,16 @@ elif args.ali :
     print("nombre de reads non aligné : ", read_non_aligné)
     print("pourcentage de read correctement apparié : ", format((read_non_aligné / len(d_sam)) * 100, '.3f'), " %",
           "\n")
-
+    print("pair read", "\n")
+    
     print("\u2022 les paires de reads où un seul read de la paire est entierement mappé et l’autre non mappé", "\n")
     print("nombre de read aligné avec la paire non aligné", read_aligné_paire_non)
     print("pourcentage de read correctement apparié : ", format((read_aligné_paire_non / len(d_sam)) * 100, '.3f'),
           " %",
           "\n")
 
-    print("pair read", "\n")
+    
 elif args.qual :
     print(Sep, "7. ANALYSE DE LA QUALITÉ DE MAPPING\n", Sep, "\n", t_qual)
-
-
-
 
 
