@@ -14,9 +14,9 @@
     2. [installation of outbuildings with `requirements.txt`](#2-Instalation-of-outbuildings-with-requirement.txt)
     3. [Type of the input](#2-Type-of-the-imput)
 4. [Script execution](#Script-execution)
-    1. [Fichier `main.sh`](#1-fichier-mainsh)
-    2. [Fichier `NGS.py`](#2-fichier-ngspy)
-5. [Structure des fichiers](#structure-des-fichiers)
+    1. [Complete execution](#1-Complete-execution)
+    2. [Execution with options](#2-Execution-with-options)
+5. [Output](#structure-des-fichiers)
 6. [Auteurs](#auteurs)
 
 ---
@@ -86,6 +86,8 @@ the list of options is avalable with the folowing line of code:
 ```
 ./main.sh mapping.sam --help
 ```
+## Output 
 
+The execution of the program will print in the terminal tables that give a summary vieuw of the analysis.
 
 
