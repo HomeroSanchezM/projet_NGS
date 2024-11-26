@@ -1,19 +1,19 @@
-# Projet NGS : PROGRAMME D'ÉVALUATION DE FICHIER SAM
+# NGS Projet : SAM FILE EVALUATION PROGRAM
 **COQUERELLE MICKAEL - HOMERO SANCHEZ**  
 **Date** : 17.11.2024  
 **SCORE** : SAM Characterization and Observational Report for Evaluations
 
 ---
-## EN COURS DE DEVELOPPEMENT 
-## Table des matières
+ 
+## Table of content
 
 1. [Introduction](#introduction)
-2. [Prérequis](#prérequis)
-3. [Installation et configuration](#installation-et-configuration)
-    1. [Créer un environnement virtuel](#1-créer-un-environnement-virtuel)
-    2. [Installer Python](#2-installer-python)
-    3. [Installer les dépendances avec `requirements.txt`](#3-installer-les-dépendances-avec-requirementstxt)
-4. [Exécution des scripts](#exécution-des-scripts)
+2. [Prerequisites](#Prerequisites)
+3. [Installation and configuration](#installation-and-configuration)
+    1. [Import of the project](#1-Import-of-the-project)
+    2. [installation of outbuildings with `requirements.txt`](#2-Instalation-of-outbuildings-with-requirement.txt)
+    3. [Type of the input](#2-Type-of-the-imput)
+4. [Script execution](#Script-execution)
     1. [Fichier `main.sh`](#1-fichier-mainsh)
     2. [Fichier `NGS.py`](#2-fichier-ngspy)
 5. [Structure des fichiers](#structure-des-fichiers)
@@ -23,33 +23,41 @@
 
 ## Introduction
 
-Ce projet a pour but d'analyser et de caractériser les fichiers **SAM (Sequence Alignment/Map)**. Il permet d'extraire par exemple des informations détaillées sur les flags présents dans un fichier SAM, de compter leur occurrence et de produire un rapport sous la forme d'un tableau, observant les différentes caractéristiques des données.
-
+This project aims to analyze and characterize **SAM (Sequence Alignment/Map)** files. It allows you to extract, for example, detailed information on the flags present in a SAM file, to count their occurrence and to produce a report in the form of a table, observing the different characteristics of the data.
 ---
 
-## Prérequis
+## Prerequisites
 
-Avant de pouvoir exécuter ce projet, vous devez disposer de certains outils et programmes installés sur votre machine.
+Before you can run this project, you need to have certain tools and programs installed on your machine.
 
-- **Python 3.6** : Utilisé pour exécuter les scripts.
-- **Pip** : Pour gérer les dépendances Python.
-- **Système Linux ou similaire** : Ce projet est conçu pour fonctionner sous Linux.
-
+- **Python 3.6** : Used to execute scripts.
+- **Pip** : Used to manage Python dependencies.
+- **Linux or similar** : This project is designed to run on Linux.
 ---
 
 ## Installation et configuration
-Pour installer l'ensemble des fichier du notre projet vous dever saisir le ligne de code suivante dans votre terminal: 
+
+### Import of the project 
+To install all the files in our project, you need to enter the following line of code in your terminal: 
 ```
 git clone https://github.com/HomeroSanchezM/projet_NGS.git 
 ```
-Le programme utilise les packages suivant:
+### Installation of outbuildings  
+The program uses the following packages:
 - **panda**
 - **pars**
 - **os**
 - **re**
   
-Afin de télécharger automatiquement les packages on a inclut un fichier requirement.txt, afin de lexecuter vous dever saisir la ligne de code suivante :  
+In order to automatically download the packages we have included a requirement.txt file, in order to run it you must enter the following line of code in your terminal:  
 ```
 pip install -r requirements.txt 
 ```
+### Type of the input 
+
+The project is adapted for the analisis of SAM files containing aligned DNA sequence reads. During the execution, the SAM file is the only Imput needed and have to be add to the same folder that contain the project's files. For more information ot the SAM format, please read the documentation **descriptive_sam.pdf** of the project. 
+
+## Script execution
+
+
 
