@@ -72,13 +72,13 @@ Here you have an example of execution using a SAM file present in the project fi
 
 The program have differents options that allow the user to only extract the information needed, the options are:
 
--**--all** : analysis of all 
--**--cigar** : analysis of the cigar information 
--**--base** : percentage of different bases
--**--flag** : analysis of the flags
--**--pos** : 
--**--ali** :
--**--qual** : 
+- **--all** : analysis of all 
+- **--cigar** : analysis of the cigar information 
+- **--base** : percentage of different bases
+- **--flag** : analysis of the flags
+- **--pos** : 
+- **--ali** :
+- **--qual** : 
 
 
 the list of options is avalable with the folowing line of code: 
