@@ -2,7 +2,7 @@ import sys  # Pour donner des parametres lors de l'appel de la fonction sur le t
 import pandas as pd  # Pour faire des tableau
 import re  # Exploitation des regex pour extraire les motifs du CIGAR en autre.
 import matplotlib.pyplot as plt  # Pour faire des représentation graphiques des Outputs
-import argparse  # Pour gérer le système d'options en argument dans bash.
+#import argparse  # Pour gérer le système d'options en argument dans bash.
 
 
 # DANS LE README :
