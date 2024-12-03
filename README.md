@@ -73,12 +73,12 @@ this execution will analyse and print by default a complete analysis of the your
 
 The program have differents options that allow the user to only extract the information needed, the options are:
 
-- **--all** : analysis of all 
+- **--all** : analysis of all
+- **--ali** : Preliminary analysis of the alignment
 - **--cigar** : analysis of the cigar information 
 - **--base** : percentage of different bases
 - **--flag** : analysis of the flags
 - **--pos** : analysis of the position of the fisrt AA
-- **--ali** : Sequence of the alignement
 - **--qual** : quality of the mapping
 
 the list of options is avalable with the folowing line of code: 
