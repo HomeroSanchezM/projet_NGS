@@ -213,8 +213,33 @@ args = parser.parse_args()
 
 if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual]):
     print("Rapport integrale de l'analyse du fichier SAM : \n")
+   # __________________________________________________________________________________________________________________________________________________________________________________________________ #
+    # preliminary analysis
+    print(Sep, "1. PRELIMINARY ANALYSIS  \n", Sep, "\n")
+
+    print("number of segments : ", len(d_sam), "\n")
+    print("single read:", "\n")
+
+    print("\u2022 segment aligned", "\n")
+    print("segments properly aligned according to the aligner : ", read_aligne)
+    print("percentage of segments properly aligned : ", format((read_aligne / len(d_sam)) * 100, '.3f'), " %", "\n")
+
+    print("\u2022 segment unmapped", "\n")
+    print("number of segment unmapped : ", read_non_aligne)
+    print("percentagz of segments unmapped : ", format((read_non_aligne / len(d_sam)) * 100, '.3f'), " %",
+          "\n")
+    #print("pair read", "\n")
+
+    #print("\u2022 les paires de reads où un seul read de la paire est entierement mappe et l’autre non mappe", "\n")
+    #print("nombre de read aligne avec la paire non aligne", read_aligne_paire_non)
+    #print("pourcentage de read correctement apparie : ", format((read_aligne_paire_non / len(d_sam)) * 100, '.3f'),
+    #      " %",
+    #      "\n")
+
+   
+   
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
-    # Analyze the CIGAR
+    # Analysis of the CIGAR
     comptes_CIGAR = analyse_CIGAR(d_sam)
 
     # Construct the DataFrame for display in the terminal.
@@ -235,6 +260,7 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual]):
 
     print(" ", Sep, "2. ANALYSE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTION RELATIVE  \n", Sep, t_data_bases, "\n")
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
+    # Analysis of the flags
     data = [(f"{cle}  |", f"{valeurs[0]} |", f"{valeurs[1]}  |") for cle, valeurs in d_flags.items()]
     t_flags = pd.DataFrame(data, columns=["Flag    ", "Occurences       ", "Decodage"])
 
@@ -252,6 +278,7 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual]):
           "\u2022 K: Duplication due à la PCR ou au processus optique.\n",
           "\u2022 L: Alignement supplementaire (non specifique, alignement multiple).\n", "\n", t_flags)
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
+    #starts positions
     print(f"nombre de positions : {len(analyse_Dpos(d_sam))}")
 
     d_posD = analyse_Dpos(d_sam)
@@ -260,32 +287,12 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual]):
     t_Data_pos = pd.DataFrame(Data_pos, columns=["Position de depart", "Nombre de reads"])
 
     print(" ", Sep, "4. DISTRIBUTIONS DES READS PAR POSITIONS DE DEPART  \n", Sep, t_Data_pos, "\n")
-    # __________________________________________________________________________________________________________________________________________________________________________________________________ #
-    print(Sep, "5. ANALYSE DE L'ALIGNEMENT  \n", Sep, "\n")
+    
 
-    print("nombre de reads : ", len(d_sam), "\n")
-    print("single read:", "\n")
-
-    print("\u2022 read mappes", "\n")
-    print("nombre de reads apparie correctement selon les critères de l'aligneur : ", read_aligne)
-    print("pourcentage de read correctement apparie : ", format((read_aligne / len(d_sam)) * 100, '.3f'), " %", "\n")
-
-    print("\u2022 read non mappes", "\n")
-    print("nombre de reads non aligne : ", read_non_aligne)
-    print("pourcentage de read correctement apparie : ", format((read_non_aligne / len(d_sam)) * 100, '.3f'), " %",
-          "\n")
-    print("pair read", "\n")
-
-    print("\u2022 les paires de reads où un seul read de la paire est entierement mappe et l’autre non mappe", "\n")
-    print("nombre de read aligne avec la paire non aligne", read_aligne_paire_non)
-    print("pourcentage de read correctement apparie : ", format((read_aligne_paire_non / len(d_sam)) * 100, '.3f'),
-          " %",
-          "\n")
-
-    data = [(f"{cle}  |", f"{valeurs[0]} |", f"{valeurs[1]}  |") for cle, valeurs in d_flags.items()]
-    t_flags = pd.DataFrame(data, columns=["Flag    ", "Occurences       ", "Decodage"])
+   
 
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
+    #Analysis of the quality
     d_qual = analyse_qualite(d_sam)
 
     data = [(f"{cle}  |", f"{valeurs} |") for cle, valeurs in d_qual.items()]
@@ -333,26 +340,27 @@ elif args.flag :
 elif args.pos :
     print(" ", Sep, "4. DISTRIBUTIONS DES READS PAR POSITIONS DE DEPART  \n", Sep, t_Data_pos, "\n")
 elif args.ali :
-    print(Sep, "5. ANALYSE DE L'ALIGNEMENT  \n", Sep, "\n")
+    print(Sep, "1. PRELIMINARY ANALYSIS  \n", Sep, "\n")
 
-    print("nombre de reads : ", len(d_sam), "\n")
+    print("number of segments : ", len(d_sam), "\n")
     print("single read:", "\n")
 
-    print("\u2022 read mappes", "\n")
-    print("nombre de reads apparie correctement selon les critères de l'aligneur : ", read_aligne)
-    print("pourcentage de read correctement apparie : ", format((read_aligne / len(d_sam)) * 100, '.3f'), " %", "\n")
+    print("\u2022 segment aligned", "\n")
+    print("segments properly aligned according to the aligner : ", read_aligne)
+    print("percentage of segments properly aligned : ", format((read_aligne / len(d_sam)) * 100, '.3f'), " %", "\n")
 
-    print("\u2022 read non mappes", "\n")
-    print("nombre de reads non aligne : ", read_non_aligne)
-    print("pourcentage de read correctement apparie : ", format((read_non_aligne / len(d_sam)) * 100, '.3f'), " %",
+    print("\u2022 segment unmapped", "\n")
+    print("number of segment unmapped : ", read_non_aligne)
+    print("percentagz of segments unmapped : ", format((read_non_aligne / len(d_sam)) * 100, '.3f'), " %",
           "\n")
-    print("pair read", "\n")
     
-    print("\u2022 les paires de reads où un seul read de la paire est entierement mappe et l’autre non mappe", "\n")
-    print("nombre de read aligne avec la paire non aligne", read_aligne_paire_non)
-    print("pourcentage de read correctement apparie : ", format((read_aligne_paire_non / len(d_sam)) * 100, '.3f'),
-          " %",
-          "\n")
+    #print("pair read", "\n")
+    
+    #print("\u2022 les paires de reads où un seul read de la paire est entierement mappe et l’autre non mappe", "\n")
+    #print("nombre de read aligne avec la paire non aligne", read_aligne_paire_non)
+    #print("pourcentage de read correctement apparie : ", format((read_aligne_paire_non / len(d_sam)) * 100, '.3f'),
+    #      " %",
+    #      "\n")
 
 elif args.qual :
     d_qual = analyse_qualite(d_sam)
