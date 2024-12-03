@@ -45,7 +45,7 @@ git clone https://github.com/HomeroSanchezM/projet_NGS.git
 ```
 ### Installation of outbuildings  
 The program uses the following packages:
-- **panda**
+- **pandas**
 - **pars**
 - **os**
 - **re**
