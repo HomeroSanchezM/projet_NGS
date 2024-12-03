@@ -359,5 +359,3 @@ elif args.qual :
     t_qual = pd.DataFrame(data, columns=["Qualite    ", "Occurences       "])
 
     print(Sep, "6. ANALYSE DE LA QUALITe DE MAPPING\n", Sep, "\n", t_qual)
-
-
