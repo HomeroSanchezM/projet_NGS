@@ -198,15 +198,15 @@ def analyse_qualite(d_sam):
 #                                                    8. DEFINITIONS OF OPTIONS TO BE PASSED AS PARAMETERS TO THE MAIN SHELL SCRIPT > $1 AND SCHEDULING                                                #
 # __________________________________________________________________________________________________________________________________________________________________________________________________ #
 
-parser = argparse.ArgumentParser(description="Analyse du fichier SAM.")
-parser.add_argument("sam_file", help="Chemin vers le fichier SAM.")
-parser.add_argument("--all", action="store_true", help="Executer toutes les analyses (par defaut).")
-parser.add_argument("--cigar", action="store_true", help="Analyser des motifs CIGAR.")
-parser.add_argument("--base", action="store_true", help="Analyse de la distribution nucleotidiques du fichier.")
-parser.add_argument("--flag", action="store_true", help="Traduction des flags ")
-parser.add_argument("--pos", action="store_true", help="Distribution des reads en fonction de leurs positions")
-parser.add_argument("--ali", action="store_true", help="Analyse de l'appariement")
-parser.add_argument("--qual", action="store_true", help="Analyse de la qualite de l'alignement")
+parser = argparse.ArgumentParser(description="Analysis of SAM files.")
+parser.add_argument("sam_file", help="path to SAM file.")
+parser.add_argument("--all", action="store_true", help="Run all the analysis (by default).")
+parser.add_argument("--cigar", action="store_true", help="CIGAR analysis.")
+parser.add_argument("--base", action="store_true", help="Nucleotide analysis")
+parser.add_argument("--flag", action="store_true", help="Flag translation")
+parser.add_argument("--pos", action="store_true", help="Start position of segments aligned")
+parser.add_argument("--ali", action="store_true", help="Preliminary analysis")
+parser.add_argument("--qual", action="store_true", help="Quality of the alignment")
 args = parser.parse_args()
 
 # Define the conditional structure to perform all analyses if no arguments are provided. Otherwise, execute the requested analyses:
@@ -258,7 +258,7 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual, a
     t_Data_cigar = pd.DataFrame(Data_cigar,
                             columns=["Motif       ", "Nom            ", "Occurences          ", "Valeur relative"])
                             
-    print(" ", Sep, "1. ANALYSE DES CIGARS : COMPTAGES DES MOTIFS ET DISTRIBUTION RELATIVE \n", Sep, "\n", t_Data_cigar, "\n")
+    print(" ", Sep, "CIGARS ANALYSIS : Patern counts and relative distribution \n", Sep, "\n", t_Data_cigar, "\n")
 	
    
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
@@ -266,19 +266,20 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual, a
     data = [(f"{cle}  |", f"{valeurs[0]} |", f"{valeurs[1]}  |") for cle, valeurs in d_flags.items()]
     t_flags = pd.DataFrame(data, columns=["Flag    ", "Occurences       ", "Decodage"])
 
-    print(Sep, "ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n", Sep, "different commentaires possibles: \n",
-          "\u2022 A: Read apparie.\n",
-          "\u2022 B: Segments apparies correctement selon les critères de l'aligneur. \n",
-          "\u2022 C: Segment particulier non aligne. \n",
-          "\u2022 D: Segment complementaire non aligne sur le brin negatif. \n",
-          "\u2022 E: Segment est reverse complement.\n",
-          "\u2022 F: Segment complementaire est reverse complement.\n",
-          "\u2022 G: Il s'agit du premier read d'une paire sur le brin positif (5'->3').\n",
-          "\u2022 H: Il s'agit du second read d'une paire sur le brin negatif (5' -> 3').\n",
-          "\u2022 I: Alignement secondaire (non specifique, alignement multiple).\n",
-          "\u2022 J: Read qui n'a pas passe les filtres de qualite.\n",
-          "\u2022 K: Duplication due à la PCR ou au processus optique.\n",
-          "\u2022 L: Alignement supplementaire (non specifique, alignement multiple).\n", "\n", t_flags)
+    print(Sep, "FLAG ANALYSIS : Translation and occurences \n", Sep, "different commentaires possibles: \n",
+          "\u2022 A: Paired read.\n",
+          "\u2022 B: Segment paired correctly according to alignment criteria. \n",
+          "\u2022 C: Segment not aligned. \n",
+          "\u2022 D: Mate is not aligned. \n",
+          "\u2022 E: Read is mapped to the reverse strand.\n",
+          "\u2022 F: Mate is mapped to the reverse strand.\n",
+          "\u2022 G: First read in a pair (5'->3').\n",
+          "\u2022 H: Second read in a pair on the reverse strand.\n",
+          "\u2022 I: Secondary alignment (non-specific, multiple alignment).\n",
+          "\u2022 J: Read failed quality control filters.\n",
+          "\u2022 K: PCR or optical duplicate.\n",
+          "\u2022 L: Supplemental alignment (non-specific, multiple alignment).\n", "\n", t_flags)
+   
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
     #starts positions
     print(f"nombre de positions : {len(analyse_Dpos(d_sam))}")
@@ -288,7 +289,7 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual, a
     Data_pos = [(f"{cle}   |", f"{val}   |") for cle, val in d_posD.items()]
     t_Data_pos = pd.DataFrame(Data_pos, columns=["Position de depart", "Nombre de reads"])
 
-    print(" ", Sep, "DISTRIBUTIONS DES READS PAR POSITIONS DE DEPART  \n", Sep, t_Data_pos, "\n")
+    print(" ", Sep, "START POSITION OF SEGMENT ALIGNED  \n", Sep, t_Data_pos, "\n")
     
 
    
@@ -299,7 +300,7 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual, a
 
     data = [(f"{cle}  |", f"{valeurs} |") for cle, valeurs in d_qual.items()]
     t_qual = pd.DataFrame(data, columns=["Qualite    ", "Occurences       "])
-    print(Sep, "ANALYSE DE LA QUALITe DE MAPPING\n", Sep, "\n",t_qual)
+    print(Sep, "ANALISYS OF THE QUALITY OF THE ALIGNMENT\n", Sep, "\n",t_qual)
 
 elif args.cigar :
     # Analyze the CIGAR string :
@@ -311,7 +312,7 @@ elif args.cigar :
     t_Data_cigar = pd.DataFrame(Data_cigar,
                             columns=["Motif       ", "Nom            ", "Occurences          ", "Valeur relative"])
                             
-    print(" ", Sep, "ANALYSE DES CIGARS : COMPTAGES DES MOTIFS ET DISTRIBUTION RELATIVE \n", Sep, "\n", t_Data_cigar,
+    print(" ", Sep, "CIGARS ANALYSIS : Patern counts and relative distribution \n", Sep, "\n", t_Data_cigar,
           "\n" )
 elif args.base :
     # Call the analyse_SEQ function
@@ -328,20 +329,20 @@ elif args.base :
 elif args.flag :
     data = [(f"{cle}  |", f"{valeurs[0]} |", f"{valeurs[1]}  |") for cle, valeurs in d_flags.items()]
     t_flags = pd.DataFrame(data, columns=["Flag    ", "Occurences       ", "Decodage"])
-
-    print(Sep, "ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n", Sep, "different commentaires possibles: \n",
-          "\u2022 A: Read apparie.\n",
-          "\u2022 B: Segments apparies correctement selon les critères de l'aligneur. \n",
-          "\u2022 C: Segment particulier non aligne. \n",
-          "\u2022 D: Segment complementaire non aligne sur le brin negatif. \n",
-          "\u2022 E: Segment est reverse complement.\n",
-          "\u2022 F: Segment complementaire est reverse complement.\n",
-          "\u2022 G: Il s'agit du premier read d'une paire sur le brin positif (5'->3').\n",
-          "\u2022 H: Il s'agit du second read d'une paire sur le brin negatif (5' -> 3').\n",
-          "\u2022 I: Alignement secondaire (non specifique, alignement multiple).\n",
-          "\u2022 J: Read qui n'a pas passe les filtres de qualite.\n",
-          "\u2022 K: Duplication due à la PCR ou au processus optique.\n",
-          "\u2022 L: Alignement supplementaire (non specifique, alignement multiple).\n", "\n", t_flags)
+    print(Sep, "FLAG ANALYSIS : Translation and occurences  \n", Sep, "different commentaires possibles: \n",
+          "\u2022 A: Paired read.\n",
+          "\u2022 B: Segment paired correctly according to alignment criteria. \n",
+          "\u2022 C: Segment not aligned. \n",
+          "\u2022 D: Mate is not aligned. \n",
+          "\u2022 E: Read is mapped to the reverse strand.\n",
+          "\u2022 F: Mate is mapped to the reverse strand.\n",
+          "\u2022 G: First read in a pair (5'->3').\n",
+          "\u2022 H: Second read in a pair on the reverse strand.\n",
+          "\u2022 I: Secondary alignment (non-specific, multiple alignment).\n",
+          "\u2022 J: Read failed quality control filters.\n",
+          "\u2022 K: PCR or optical duplicate.\n",
+          "\u2022 L: Supplemental alignment (non-specific, multiple alignment).\n", "\n", t_flags)
+    
 elif args.pos :
     print(f"nombre de positions : {len(analyse_Dpos(d_sam))}")
 
@@ -350,7 +351,7 @@ elif args.pos :
     Data_pos = [(f"{cle}   |", f"{val}   |") for cle, val in d_posD.items()]
     t_Data_pos = pd.DataFrame(Data_pos, columns=["Position de depart", "Nombre de reads"])
 
-    print(" ", Sep, "DISTRIBUTIONS DES READS PAR POSITIONS DE DEPART  \n", Sep, t_Data_pos, "\n")
+    print(" ", Sep, "START POSITION OF SEGMENT ALIGNED   \n", Sep, t_Data_pos, "\n")
 elif args.ali :
     print(Sep, "PRELIMINARY ANALYSIS  \n", Sep, "\n")
 
@@ -380,4 +381,4 @@ elif args.qual :
     data = [(f"{cle}  |", f"{valeurs} |") for cle, valeurs in d_qual.items()]
     t_qual = pd.DataFrame(data, columns=["Qualite    ", "Occurences       "])
 
-    print(Sep, "ANALYSE DE LA QUALITe DE MAPPING\n", Sep, "\n", t_qual)
+    print(Sep, "ANALISYS OF THE QUALITY OF THE ALIGNMENT\n", Sep, "\n", t_qual)
