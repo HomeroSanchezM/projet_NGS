@@ -44,6 +44,8 @@ def dico_extraction1(fichier_sam):
             }
             id_ligne += 1
     file.close()                        # We reclose the file sam
+    return d_sam 
+
 d_sam = dico_extraction1(fichier_sam)   # To call function dico_extraction1 for get the dictionnary d_sam
 
 # __________________________________________________________________________________________________________________________________________________________________________________________________________#
@@ -118,7 +120,7 @@ def decodage_flags(flag_value):
     l_synthese = []
     # Each bit represents a specific flag and its associated comment:
     for i_bit, s_commentaire in d_Binary_sam.items():
-        if valeur_du_flag & i_bit:  # Check whether each bit is activated or not for the flag value
+        if flag_value & i_bit:  # Check whether each bit is activated or not for the flag value
             l_synthese.append(s_commentaire)
 
     return l_synthese
