@@ -224,9 +224,9 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual]):
     print("segments properly aligned according to the aligner : ", read_aligne)
     print("percentage of segments properly aligned : ", format((read_aligne / len(d_sam)) * 100, '.3f'), " %", "\n")
 
-    print("\u2022 segment unmapped", "\n")
+    print("\u2022 segments unmapped", "\n")
     print("number of segment unmapped : ", read_non_aligne)
-    print("percentagz of segments unmapped : ", format((read_non_aligne / len(d_sam)) * 100, '.3f'), " %",
+    print("percentage of segments unmapped : ", format((read_non_aligne / len(d_sam)) * 100, '.3f'), " %",
           "\n")
     #print("pair read", "\n")
 
@@ -236,8 +236,17 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual]):
     #      " %",
     #      "\n")
 
-   
-   
+    
+    # __________________________________________________________________________________________________________________________________________________________________________________________________ #
+    # Call the analyse_SEQ function
+    comptes, pourcentages, total = analyse_SEQ(d_sam)
+    
+    # Display the results of the bases
+    data_bases = [(f"{cle} |", f"{Val_SEQ[1]} |", f"{Val_SEQ[0]} |", f"{pourcentages[cle]:.2f} %") for cle, Val_SEQ in comptes.items()]
+    t_data_bases = pd.DataFrame(data_bases, columns=["Motif       ", "Nom          ", "Occurences    ", "Valeur relative"])
+
+    print(" ", Sep, "2. NUCLEOTIDES ANALYSIS : Relative distribution of the nucleotides in the segments  \n", Sep, t_data_bases, "\n")
+    print("percentage of GC of all the segments : ",f"{pourcentages['C']+pourcentages['G']:.2f} %" )
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
     # Analysis of the CIGAR
     comptes_CIGAR = analyse_CIGAR(d_sam)
@@ -251,14 +260,7 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual]):
                             
     print(" ", Sep, "1. ANALYSE DES CIGARS : COMPTAGES DES MOTIFS ET DISTRIBUTION RELATIVE \n", Sep, "\n", t_Data_cigar, "\n")
 	
-    # __________________________________________________________________________________________________________________________________________________________________________________________________ #
-    # Call the analyse_SEQ function
-    comptes, pourcentages, total = analyse_SEQ(d_sam)
-    # Display the results of the bases
-    data_bases = [(f"{cle} |", f"{Val_SEQ[1]} |", f"{Val_SEQ[0]} |", f"{pourcentages[cle]:.2f} %") for cle, Val_SEQ in comptes.items()]
-    t_data_bases = pd.DataFrame(data_bases, columns=["Motif       ", "Nom          ", "Occurences    ", "Valeur relative"])
-
-    print(" ", Sep, "2. ANALYSE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTION RELATIVE  \n", Sep, t_data_bases, "\n")
+   
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
     # Analysis of the flags
     data = [(f"{cle}  |", f"{valeurs[0]} |", f"{valeurs[1]}  |") for cle, valeurs in d_flags.items()]
@@ -314,11 +316,14 @@ elif args.cigar :
 elif args.base :
     # Call the analyse_SEQ function
     comptes, pourcentages, total = analyse_SEQ(d_sam)
+    
     # Display the results of the bases
     data_bases = [(f"{cle} |", f"{Val_SEQ[1]} |", f"{Val_SEQ[0]} |", f"{pourcentages[cle]:.2f} %") for cle, Val_SEQ in comptes.items()]
     t_data_bases = pd.DataFrame(data_bases, columns=["Motif       ", "Nom          ", "Occurences    ", "Valeur relative"])
 
-    print(" ", Sep, "2. ANALYSE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTION RELATIVE  \n", Sep, t_data_bases, "\n")
+    print(" ", Sep, "2. NUCLEOTIDES ANALYSIS : Relative distribution of the nucleotides in the segments  \n", Sep, t_data_bases, "\n")
+    print("percentage of GC of all the segments : ",f"{pourcentages['C']+pourcentages['G']:.2f} %" )
+   
     
 elif args.flag :
     data = [(f"{cle}  |", f"{valeurs[0]} |", f"{valeurs[1]}  |") for cle, valeurs in d_flags.items()]
