@@ -1,60 +1,24 @@
-import sys  # Pour donner des parametres lors de l'appel de la fonction sur le terminal ou dans un .sh
-import pandas as pd  # Pour faire des tableau
-import re  # Exploitation des regex pour extraire les motifs du CIGAR en autre.
-import matplotlib.pyplot as plt  # Pour faire des représentation graphiques des Outputs
-#import argparse  # Pour gérer le système d'options en argument dans bash.
-
-
-# DANS LE README :
-# DIRE CE QUE LE PROGRAMME FAIT
-# FAIRE UN REQUIREMENT TXT AVEC TOUS LES PREREQUIS ET SURTOUT LENVIRONNEMENT DETRAVAIL
-# QUELLE TYPE DE FICHIER EN ENTREE ET OU IL DOIT SE TROUVER ET SOUS QUEL FORMAT
-# COMMENT LE SCRIPT FONCTIONNE.
-# BIEN EXPLIQUE L'OUTPUT.
-# LICENCE POUR LES GENS QUI UTILISE NOTRE CODE ET LA VERSION,
-
-# DICOEXTRACTION1
-# {
-#    "ID_LIGNE1": {
-#        "QNAME": QNAME1,
-#        "FLAG": FLAG1,
-#        "RNAME": RNAME1,
-#        "POS": POS1,
-#        "MAPQ": MAPQ1,
-#        "CIGAR": CIGAR1,
-#        "RNEXT": RNEXT1,
-#        "PNEXT": PNEXT1,
-#        "TLEN": TLEN1,
-#        "SEQ": SEQ1,
-#        "QUAL": QUAL1
-#    },
-#    "ID_LIGNE2": {
-#        "QNAME": QNAME2,
-#        "FLAG": FLAG2,
-#        "RNAME": RNAME2,
-#        # etc.
-#    },
-#    # etc.
-# }
+import sys 
+import pandas as pd 
+import re 
+import argparse 
 
 fichier_sam = sys.argv[1]
 Sep = ("-" * 70) + "\n"
 
-
 # __________________________________________________________________________________________________________________________________________________________________________________________________________#
-#                                                                1. CREATION DU DICTIONNAIRE PRINCIPAL PAR STRUCTURE ITERATIVE FOR                                                                         #
+#                                                                1. CREATION OF THE MAIN DICTIONARY BY ITERATIVE STRUCTURE FOR                                                                              #
 # __________________________________________________________________________________________________________________________________________________________________________________________________________#
 
-# La fonction dico_extraction1 prend en entrée une chaîne de caractères  correspondant au chemin d'un fichier SAM et retourne un dictionnaire  sous la forme du DICOEXTRACTION1.
+# The dico_extraction1 function takes as input a character string corresponding to the path of a SAM file and returns a dictionary in the form of DICOEXTRACTION1.
 
 def dico_extraction1(fichier_sam):
-    file = open(fichier_sam, 'r')  # Ouverture en mode lecture
-    d_sam = {}  # Création du dictionnaire vide pour contenir les infos des reads
+    file = open(fichier_sam, 'r')         # Opening in play mode
+    d_sam = {}                            # Creation of an empty dictionary to contain the information from the reads
     id_ligne = 1
     for i_ligne in file:
-        if i_ligne[0] != "@":  # Vérifie que la ligne ne commence pas par @
-            l_colonnes = i_ligne.split()  # Découpe la ligne en colonnes séparées par des tabulations
-            # Extraire les champs du fichier SAM
+        if i_ligne[0] != "@":             # Check that the line does not begin with @.
+            l_colonnes = i_ligne.split()  # Divides the line into columns separated by tabs and extracts the columns
             QNAME = l_colonnes[0]
             FLAG = l_colonnes[1]
             RNAME = l_colonnes[2]
@@ -66,8 +30,7 @@ def dico_extraction1(fichier_sam):
             TLEN = l_colonnes[8]
             SEQ = l_colonnes[9]
 
-            # Ajouter les informations dans le dictionnaire
-            d_sam[id_ligne] = {
+            d_sam[id_ligne] = {           # Add information to the dictionary
                 "QNAME": QNAME,
                 "FLAG": FLAG,
                 "RNAME": RNAME,
@@ -80,27 +43,22 @@ def dico_extraction1(fichier_sam):
                 "SEQ": SEQ
             }
             id_ligne += 1
-    file.close()  # On referme le fichier SAM
-    return d_sam
-
-
-# Appeler la fonction dico_extraction1 pour obtenir le dictionnaire d_sam
-d_sam = dico_extraction1(fichier_sam)
-
+    file.close()                        # We reclose the file sam
+d_sam = dico_extraction1(fichier_sam)   # To call function dico_extraction1 for get the dictionnary d_sam
 
 # __________________________________________________________________________________________________________________________________________________________________________________________________________#
-#                                                    2. TRAITEMENT DES CIGARS : EXTRACTION DES VALEURS ABSOLUES, CALCUL DES SOMMES ET VALEURS RELATIVES (REGEX)                                            #
+#                                                    2. CIGARs TREATMENT : extract the absolute values and calculate sum and relative's values                                                              #
 # __________________________________________________________________________________________________________________________________________________________________________________________________________#
 def analyse_CIGAR(d_sam):
     comptes_CIGAR = {
-        'M': ["Alignés", 0], 'I': ["Insertions", 0], 'D': ["Délétions", 0],
+        'M': ["Alignes", 0], 'I': ["Insertions", 0], 'D': ["Deletions", 0],
         'N': ["Sauts de bases", 0], 'S': ["Soft Clipping", 0], 'H': ["Hard Clipping", 0],
-        'P': ["Complétion", 0], '=': ["Match exact", 0], 'X': ["Mismatch", 0]}
+        'P': ["Completion", 0], '=': ["Match exact", 0], 'X': ["Mismatch", 0]}
 
     REGEX_CIGAR = re.compile(r'(\d+)([MIDNSHP=X])')
     TOTAL_OPE_CIG = 0
 
-    # Calcul des sommes pour chaque motif CIGAR
+    # Calculate the sums for each motif CIGAR
     for read in d_sam.values():
         matches = REGEX_CIGAR.findall(read["CIGAR"])
         for SUM_OPE_CIG_str, OPE_CIG in matches:
@@ -109,119 +67,91 @@ def analyse_CIGAR(d_sam):
                 comptes_CIGAR[OPE_CIG][1] += SUM_OPE_CIG
                 TOTAL_OPE_CIG += SUM_OPE_CIG
 
-    # Calcul des pourcentages et mise à jour du dictionnaire
+    # Calculate the percentage and update the dictionnary
     for OPE_CIG, (commentaire, count) in comptes_CIGAR.items():
         pourcentage = (count / TOTAL_OPE_CIG * 100) if TOTAL_OPE_CIG > 0 else 0
-        comptes_CIGAR[OPE_CIG].append(pourcentage)  # Ajouter le pourcentage au dictionnaire
+        comptes_CIGAR[OPE_CIG].append(pourcentage)  # add percentage at the dictionnary
 
     return comptes_CIGAR
-
-
-# Analyser les CIGAR
-comptes_CIGAR = analyse_CIGAR(d_sam)
-
-# Construction du Dataframe pour l'affichage dans le terminal.
-Data_cigar = [(f"{cle_CIG}|", f"{Val_CIG[0]} |", f"{Val_CIG[1]} |", f"{Val_CIG[2]:.3f} % |") for cle_CIG, Val_CIG in
-              comptes_CIGAR.items()]
-t_Data_cigar = pd.DataFrame(Data_cigar,
-                            columns=["Motif       ", "Nom            ", "Occurences          ", "Valeur relative"])
-
-
+    
 # __________________________________________________________________________________________________________________________________________________________________________________________________________#
-#                                                            3. FREQUENCE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTIONS RELATIVES DU FICHIER                                                                    
+#                                                                        3. Relative distribution of the nucleotides in the sequences                                         
 # __________________________________________________________________________________________________________________________________________________________________________________________________________#
 
 def analyse_SEQ(d_sam):
-    comptes_base = {'A': [0, "Adénine"], 'T': [0, "Thymine"], 'G': [0, "Guanine"], 'C': [0, "Cytosine"]}
+    comptes_base = {'A': [0, "Adenine"], 'T': [0, "Thymine"], 'G': [0, "Guanine"], 'C': [0, "Cytosine"]}
 
-    for read in d_sam.values():  # Pour chaque séquence
+    for read in d_sam.values():             # For each sequence
         Seq_d_sam = read["SEQ"]
-        for base in Seq_d_sam:  # Pour chaque base de chaque séquence
+        for base in Seq_d_sam:              # For each base of each sequence
             if base in comptes_base:
-                comptes_base[base][0] += 1  # Mise à jour du comptage de la base trouvée
+                comptes_base[base][0] += 1  # Update count of the find nucleotide
 
-    total_BASE = sum(count[0] for count in comptes_base.values())  # Total des bases comptées
+    total_BASE = sum(count[0] for count in comptes_base.values())  # Total of nucleotides sum
 
-    PRCT_BASES = {  # Distribution relative des bases dans les séquences
+    PRCT_BASES = {  # Relative Distribution of Bases in Sequences
         base: (count[0] / total_BASE * 100) if total_BASE > 0 else 0
         for base, count in comptes_base.items()
     }
 
     return comptes_base, PRCT_BASES, total_BASE
 
+# __________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                          4. Treatments FLAGs : translate and relative distribution                                                                   #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
 
-# Appel de la fonction analyse_SEQ
-comptes, pourcentages, total = analyse_SEQ(d_sam)
-
-# Affichage des résultats des bases
-data_bases = [(f"{cle} |", f"{Val_SEQ[1]} |", f"{Val_SEQ[0]} |", f"{pourcentages[cle]:.2f} %") for cle, Val_SEQ in
-              comptes.items()]
-t_data_bases = pd.DataFrame(data_bases, columns=["Motif       ", "Nom          ", "Occurences    ", "Valeur relative"])
-
-
-# __________________________________________________________________________________________________________________________________________________________________________________________________________#
-#                                                            4. ANALYSE DE FLAG: DECODAGE ET  COMTAGE                                                                     
-# __________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                           4 TRAITEMENT DES FLAGS : TRADUCTION ET DISTRIBUTIONS                                                                           #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
-# Fonction pour décoder la valeur d'un flag en affichant les commentaires correspondants
-
-def decodage_flags(valeur_du_flag):
-    # Dictionnaire qui stocke des bits comme clés et des commentaires comme valeurs
+def decodage_flags(flag_value):
+    # Dictionary storing bits as keys and comments as values
     d_Binary_sam = {
-        1: "A",  # Read apparié.
-        2: "B",  # Segment apparié correctement selon les critères de l'aligneur.
-        4: "C",  # Segment particulier non aligné
-        8: "D",  # Segment complémentaire non aligné 
-        16: "E",  # Segment est reverse complement
-        32: "F",  # Segment complementaire est reverse complement
-        64: "G",  # Il s'agit du premier read d'une paire sur le brin positif (5'->3').
-        128: "H",  # Il s'agit du second read d'une paire sur le brin négatif (5' -> 3').
-        256: "I",  # Alignement secondaire (non spécifique, alignement multiple).\n"
-        512: "J",  # Read qui n'a pas passé les filtres de qualité.
-        1024: "K",  # Duplication due à la PCR ou au processus optique.
-        2048: "L"  # Alignement supplémentaire (non spécifique, alignement multiple).
+        1: "A",    # Paired read
+        2: "B",    # Segment paired correctly according to alignment criteria
+        4: "C",    # Segment not aligned
+        8: "D",    # Mate is not aligned
+        16: "E",   # Read is mapped to the reverse strand
+        32: "F",   # Mate is mapped to the reverse strand
+        64: "G",   # First read in a pair (5'->3')
+        128: "H",  # Second read in a pair on the reverse strand
+        256: "I",  # Secondary alignment (non-specific, multiple alignment)
+        512: "J",  # Read failed quality control filters
+        1024: "K", # PCR or optical duplicate
+        2048: "L"  # Supplemental alignment (non-specific, multiple alignment)
     }
-    l_synthese = []
 
-    # Chaque bit représente un flag spécifique et son commentaire associé :
+    l_synthese = []
+    # Each bit represents a specific flag and its associated comment:
     for i_bit, s_commentaire in d_Binary_sam.items():
-        if valeur_du_flag & i_bit:  # En gros ici on vérifie l'activation ou non de chaque bit pour la valeur du flag
+        if valeur_du_flag & i_bit:  # Check whether each bit is activated or not for the flag value
             l_synthese.append(s_commentaire)
 
     return l_synthese
 
-# Analyse des flag en utilisant les info extraite par dico_extraction1 contenu par d_sam
+# Analyze the flags using the information extracted by dico_extraction1 contained in d_sam
 
 def analyse_flag(d_sam):
     d_flags = {}
     for read in d_sam.values():
         flag_d_sam = read["FLAG"]
 
-        if flag_d_sam in d_flags:  # verifie si une clé est déja dans le dictionnaire
-            d_flags[flag_d_sam] += 1  # si elle exite deja, on l'incremente de 1
+        if flag_d_sam in d_flags: #Check if a key already exists in the dictionary
+            d_flags[flag_d_sam] += 1 # If it already exists, increment its value by 1
         else:
-            d_flags[flag_d_sam] = 1  # si la clé n'existe pas on la crée et on lui donne la valeur 1
+            d_flags[flag_d_sam] = 1  # If the key does not exist, create it and assign a value of 1
     return d_flags
 
 
-# création d'un  dictionnaire retourner par analyse_flag
+# Create a dictionary returned by analyse_flag
 d_flags = analyse_flag(d_sam)
 
-# ajout a ce dictionnaire les commmentaire de decodate_flags
+# Add the comments from decodage_flags to this dictionary
 
 for i_flag in d_flags:
-    l_decodage = decodage_flags(int(i_flag))  # création d'une liste avec les commentaires correspondant a chaque flag
-    i_nb_fois_present = d_flags[i_flag]  # recupere la valeur du nombre de flag present associe a chaque flag
-    d_flags[i_flag] = [i_nb_fois_present,
-                       l_decodage]  # associe a chaque flag une liste avec le nombre de fois que le flag est present et une liste avec les commentaires correspondant au flag
+    l_decodage = decodage_flags(int(i_flag))  # Create a list with the comments corresponding to each flag
+    i_nb_fois_present = d_flags[i_flag] # Retrieve the value representing the number of flags present, associated with each flag
+    d_flags[i_flag] = [i_nb_fois_present,l_decodage] # Associate each flag with a list containing the number of times the flag is present and a list with the corresponding comments for that flag
 
-# Conversion du dictionnaire en une liste de tuples [(clé, valeur1, valeur2), ...]
-
+# Convert the dictionnary into a list of tuples [(Key, value1, value2), ...]
 data = [(f"{cle}  |", f"{valeurs[0]} |", f"{valeurs[1]}  |") for cle, valeurs in d_flags.items()]
 t_flags = pd.DataFrame(data, columns=["Flag    ", "Occurences       ", "Decodage"])
 
-# __________________________________________________________________________________________________________________________________________________________________________________________________________#
-#                                                            5. DISTRIBUTIONS DES READS PAR POSITIONS DE DEPART                                                                   
-# __________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                             5 TRAITEMENT DES POSITIONS CHROMOSOMIQUES :                                                                             #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
+# __________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                                     5 CHROMOSOMAL POSITION PROCESSING:                                                                                   #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
 def analyse_Dpos(d_pos):
     d_posD = {}
     for read in d_pos.values():
@@ -232,177 +162,200 @@ def analyse_Dpos(d_pos):
             d_posD[POS] = 1
 
     return d_posD
+# __________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                                       6 ALIGNEMENT ANALISYS                                                                                              #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
 
-
-print(f"nombre de positions : {len(analyse_Dpos(d_sam))}")
-
-d_posD = analyse_Dpos(d_sam)
-
-Data_pos = [(f"{cle}   |", f"{val}   |") for cle, val in d_posD.items()]
-t_Data_pos = pd.DataFrame(Data_pos, columns=["Position de départ", "Nombre de reads"])
-
-# plt.bar(d_posD.keys(), d_posD.values(), color='g')
-# plt.xlabel('Positions de départ')
-# plt.ylabel('Nombre de reads')
-# plt.title('Distribution des reads par position de départ')
-# plt.show()
-
-# __________________________________________________________________________________________________________________________________________________________________________________________________________#
-#                                                            6.   ANALYSE DE L'ALIGNEMENT                                                                
-# __________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                                       6  A DEFINIR PAR HOMERO                                                                                            #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
-
-# on donne le pourcentage de read correctement apparié
-#signle read
-read_aligné = 0
-read_non_aligné = 0
-#pair read
-read_aligné_paire_non = 0
+# Provide the percentage of correctly paired reads
+read_aligne = 0
+read_non_aligne = 0
+# Pair read
+read_aligne_paire_non = 0
 
 for i_flag in d_flags:
-    if "B" in d_flags[i_flag][1]:  # si read aligné
-        read_aligné += d_flags[i_flag][0]
-    if ("C" in d_flags[i_flag][1]):  # si read non aligné
-        read_non_aligné += d_flags[i_flag][0]
-    if ("B" in d_flags[i_flag][1]) and ("D" in d_flags[i_flag][1]):  # nombre de read aligné avec la paire non aligné
-        read_aligné_paire_non += d_flags[i_flag][0]
-
-
+    if "B" in d_flags[i_flag][1]:  
+        read_aligne += d_flags[i_flag][0]
+    if ("C" in d_flags[i_flag][1]): 
+        read_non_aligne += d_flags[i_flag][0]
+    if ("B" in d_flags[i_flag][1]) and ("D" in d_flags[i_flag][1]):  # Number of reads aligned with the unaligned pair
+        read_aligne_paire_non += d_flags[i_flag][0]
 
 # __________________________________________________________________________________________________________________________________________________________________________________________________________#
-#                                                            7. ANALYSE DE LA QUALITÉ DE MAPPING                                                           
-#  __________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                          7. TRAITEMENT DE LA QUALITE DE MAPPING                                                                                           #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
-
-
-def analyse_qualité(d_sam):
+#                                                                                7.  MAPPING QUALITY ANALYSIS                                                                                    #
+# __________________________________________________________________________________________________________________________________________________________________________________________________________# 
+def analyse_qualite(d_sam):
     d_qual = {}
     for read in d_sam.values():
         qual_d_sam = read["MAPQ"]
 
-        if qual_d_sam in d_qual:  # verifie si une clé est déja dans le dictionnaire
-            d_qual[qual_d_sam] += 1  # si elle exite deja, on l'incremente de 1
+        if qual_d_sam in d_qual: # Check if a key already exists in the dictionary
+            d_qual[qual_d_sam] += 1  # If it already exists, increment its value by 1
         else:
-            d_qual[qual_d_sam] = 1  # si la clé n'existe pas on la crée et on lui donne la valeur 1
+            d_qual[qual_d_sam] = 1   # If the key does not exist, create it and assign a value of 1 
     return d_qual
 
-
-d_qual = analyse_qualité(d_sam)
-
-data = [(f"{cle}  |", f"{valeurs} |") for cle, valeurs in d_qual.items()]
-t_qual = pd.DataFrame(data, columns=["Qualité    ", "Occurences       "])
-
-# ____________________________________________________________________________________________________________________________________________________________________________________________________ #
-#                                                    DEFINITIONS DES OPTIONS A PASSER EN PARAMETRES DU MAIN SH en argument > $1  ET ORDONNANCEMENT                                                   #
 # __________________________________________________________________________________________________________________________________________________________________________________________________ #
+#                                                    8. DEFINITIONS OF OPTIONS TO BE PASSED AS PARAMETERS TO THE MAIN SHELL SCRIPT > $1 AND SCHEDULING                                                #
+# __________________________________________________________________________________________________________________________________________________________________________________________________ #
+
 parser = argparse.ArgumentParser(description="Analyse du fichier SAM.")
 parser.add_argument("sam_file", help="Chemin vers le fichier SAM.")
-parser.add_argument("--all", action="store_true", help="Exécuter toutes les analyses (par défaut).")
+parser.add_argument("--all", action="store_true", help="Executer toutes les analyses (par defaut).")
 parser.add_argument("--cigar", action="store_true", help="Analyser des motifs CIGAR.")
-parser.add_argument("--base", action="store_true", help="Analyse de la distribution nucléotidiques du fichier.")
+parser.add_argument("--base", action="store_true", help="Analyse de la distribution nucleotidiques du fichier.")
 parser.add_argument("--flag", action="store_true", help="Traduction des flags ")
 parser.add_argument("--pos", action="store_true", help="Distribution des reads en fonction de leurs positions")
 parser.add_argument("--ali", action="store_true", help="Analyse de l'appariement")
-parser.add_argument("--qual", action="store_true", help="Analyse de la qualité de l'alignement")
+parser.add_argument("--qual", action="store_true", help="Analyse de la qualite de l'alignement")
 args = parser.parse_args()
 
-# On définit la structure conditionnelle pour réaliser l'intégralité des analyses si pas d'arguments renseignés. Sinon, on exécute les analyses demandées :
+# Define the conditional structure to perform all analyses if no arguments are provided. Otherwise, execute the requested analyses:
 
 if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual]):
-    print("Rapport intégrale de l'analyse du fichier SAM : \n")
-    print(" ", Sep, "1. CREATION DU DICTIONNAIRE PRINCIPAL : EXTRACTIONS DES ELEMENTS TABULES DU FICHIER SAM ")
+    print("Rapport integrale de l'analyse du fichier SAM : \n")
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
-    print(" ", Sep, "2. ANALYSE DES CIGARS : COMPTAGES DES MOTIFS ET DISTRIBUTION RELATIVE \n", Sep, "\n", t_Data_cigar, "\n", )
+    # Analyze the CIGAR
+    comptes_CIGAR = analyse_CIGAR(d_sam)
+
+    # Construct the DataFrame for display in the terminal.
+    Data_cigar = [(f"{cle_CIG}|", f"{Val_CIG[0]} |", f"{Val_CIG[1]} |", f"{Val_CIG[2]:.3f} % |") for cle_CIG, Val_CIG in
+              comptes_CIGAR.items()]
+              
+    t_Data_cigar = pd.DataFrame(Data_cigar,
+                            columns=["Motif       ", "Nom            ", "Occurences          ", "Valeur relative"])
+                            
+    print(" ", Sep, "1. ANALYSE DES CIGARS : COMPTAGES DES MOTIFS ET DISTRIBUTION RELATIVE \n", Sep, "\n", t_Data_cigar, "\n")
+	
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
-    print(" ", Sep, "3. ANALYSE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTION RELATIVE  \n", Sep, t_data_bases, "\n")
+    # Call the analyse_SEQ function
+    comptes, pourcentages, total = analyse_SEQ(d_sam)
+    # Display the results of the bases
+    data_bases = [(f"{cle} |", f"{Val_SEQ[1]} |", f"{Val_SEQ[0]} |", f"{pourcentages[cle]:.2f} %") for cle, Val_SEQ in comptes.items()]
+    t_data_bases = pd.DataFrame(data_bases, columns=["Motif       ", "Nom          ", "Occurences    ", "Valeur relative"])
+
+    print(" ", Sep, "2. ANALYSE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTION RELATIVE  \n", Sep, t_data_bases, "\n")
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
-    print(Sep, "4. ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n", Sep, "différent commentaires possibles: \n",
-          "\u2022 A: Read apparié.\n",
-          "\u2022 B: Segments appariés correctement selon les critères de l'aligneur. \n",
-          "\u2022C: Segment particulier non aligné. \n",
-          "\u2022 D: Segment complémentaire non aligné sur le brin négatif. \n",
+    data = [(f"{cle}  |", f"{valeurs[0]} |", f"{valeurs[1]}  |") for cle, valeurs in d_flags.items()]
+    t_flags = pd.DataFrame(data, columns=["Flag    ", "Occurences       ", "Decodage"])
+
+    print(Sep, "3. ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n", Sep, "different commentaires possibles: \n",
+          "\u2022 A: Read apparie.\n",
+          "\u2022 B: Segments apparies correctement selon les critères de l'aligneur. \n",
+          "\u2022 C: Segment particulier non aligne. \n",
+          "\u2022 D: Segment complementaire non aligne sur le brin negatif. \n",
           "\u2022 E: Segment est reverse complement.\n",
           "\u2022 F: Segment complementaire est reverse complement.\n",
           "\u2022 G: Il s'agit du premier read d'une paire sur le brin positif (5'->3').\n",
-          "\u2022 H: Il s'agit du second read d'une paire sur le brin négatif (5' -> 3').\n",
-          "\u2022 I: Alignement secondaire (non spécifique, alignement multiple).\n",
-          "\u2022 J: Read qui n'a pas passé les filtres de qualité.\n",
+          "\u2022 H: Il s'agit du second read d'une paire sur le brin negatif (5' -> 3').\n",
+          "\u2022 I: Alignement secondaire (non specifique, alignement multiple).\n",
+          "\u2022 J: Read qui n'a pas passe les filtres de qualite.\n",
           "\u2022 K: Duplication due à la PCR ou au processus optique.\n",
-          "\u2022 L: Alignement supplémentaire (non spécifique, alignement multiple).\n", "\n", t_flags)
+          "\u2022 L: Alignement supplementaire (non specifique, alignement multiple).\n", "\n", t_flags)
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
-    print(" ", Sep, "5. DISTRIBUTIONS DES READS PAR POSITIONS DE DEPART  \n", Sep, t_Data_pos, "\n")
+    print(f"nombre de positions : {len(analyse_Dpos(d_sam))}")
+
+    d_posD = analyse_Dpos(d_sam)
+
+    Data_pos = [(f"{cle}   |", f"{val}   |") for cle, val in d_posD.items()]
+    t_Data_pos = pd.DataFrame(Data_pos, columns=["Position de depart", "Nombre de reads"])
+
+    print(" ", Sep, "4. DISTRIBUTIONS DES READS PAR POSITIONS DE DEPART  \n", Sep, t_Data_pos, "\n")
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
-    print(Sep, "6. ANALYSE DE L'ALIGNEMENT  \n", Sep, "\n")
+    print(Sep, "5. ANALYSE DE L'ALIGNEMENT  \n", Sep, "\n")
 
     print("nombre de reads : ", len(d_sam), "\n")
     print("single read:", "\n")
 
-    print("\u2022 read mappés", "\n")
-    print("nombre de reads apparié correctement selon les critères de l'aligneur : ", read_aligné)
-    print("pourcentage de read correctement apparié : ", format((read_aligné / len(d_sam)) * 100, '.3f'), " %", "\n")
+    print("\u2022 read mappes", "\n")
+    print("nombre de reads apparie correctement selon les critères de l'aligneur : ", read_aligne)
+    print("pourcentage de read correctement apparie : ", format((read_aligne / len(d_sam)) * 100, '.3f'), " %", "\n")
 
-    print("\u2022 read non mappés", "\n")
-    print("nombre de reads non aligné : ", read_non_aligné)
-    print("pourcentage de read correctement apparié : ", format((read_non_aligné / len(d_sam)) * 100, '.3f'), " %",
+    print("\u2022 read non mappes", "\n")
+    print("nombre de reads non aligne : ", read_non_aligne)
+    print("pourcentage de read correctement apparie : ", format((read_non_aligne / len(d_sam)) * 100, '.3f'), " %",
           "\n")
     print("pair read", "\n")
 
-    print("\u2022 les paires de reads où un seul read de la paire est entierement mappé et l’autre non mappé", "\n")
-    print("nombre de read aligné avec la paire non aligné", read_aligné_paire_non)
-    print("pourcentage de read correctement apparié : ", format((read_aligné_paire_non / len(d_sam)) * 100, '.3f'),
+    print("\u2022 les paires de reads où un seul read de la paire est entierement mappe et l’autre non mappe", "\n")
+    print("nombre de read aligne avec la paire non aligne", read_aligne_paire_non)
+    print("pourcentage de read correctement apparie : ", format((read_aligne_paire_non / len(d_sam)) * 100, '.3f'),
           " %",
           "\n")
 
-    
+    data = [(f"{cle}  |", f"{valeurs[0]} |", f"{valeurs[1]}  |") for cle, valeurs in d_flags.items()]
+    t_flags = pd.DataFrame(data, columns=["Flag    ", "Occurences       ", "Decodage"])
+
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
-    print(Sep, "7. ANALYSE DE LA QUALITÉ DE MAPPING\n", Sep, "\n",t_qual)
+    d_qual = analyse_qualite(d_sam)
+
+    data = [(f"{cle}  |", f"{valeurs} |") for cle, valeurs in d_qual.items()]
+    t_qual = pd.DataFrame(data, columns=["Qualite    ", "Occurences       "])
+    print(Sep, "6. ANALYSE DE LA QUALITe DE MAPPING\n", Sep, "\n",t_qual)
 
 elif args.cigar :
-    print(" ", Sep, "2. ANALYSE DES CIGARS : COMPTAGES DES MOTIFS ET DISTRIBUTION RELATIVE \n", Sep, "\n", t_Data_cigar,
-          "\n", )
+    # Analyze the CIGAR string :
+    comptes_CIGAR = analyse_CIGAR(d_sam)
+
+    # Construct the DataFrame for display in the terminal
+    Data_cigar = [(f"{cle_CIG}|", f"{Val_CIG[0]} |", f"{Val_CIG[1]} |", f"{Val_CIG[2]:.3f} % |") for cle_CIG, Val_CIG in
+              comptes_CIGAR.items()]
+    t_Data_cigar = pd.DataFrame(Data_cigar,
+                            columns=["Motif       ", "Nom            ", "Occurences          ", "Valeur relative"])
+                            
+    print(" ", Sep, "1. ANALYSE DES CIGARS : COMPTAGES DES MOTIFS ET DISTRIBUTION RELATIVE \n", Sep, "\n", t_Data_cigar,
+          "\n" )
 elif args.base :
-    print(" ", Sep, "3. ANALYSE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTION RELATIVE  \n", Sep, t_data_bases, "\n")
+    # Call the analyse_SEQ function
+    comptes, pourcentages, total = analyse_SEQ(d_sam)
+    # Display the results of the bases
+    data_bases = [(f"{cle} |", f"{Val_SEQ[1]} |", f"{Val_SEQ[0]} |", f"{pourcentages[cle]:.2f} %") for cle, Val_SEQ in comptes.items()]
+    t_data_bases = pd.DataFrame(data_bases, columns=["Motif       ", "Nom          ", "Occurences    ", "Valeur relative"])
+
+    print(" ", Sep, "2. ANALYSE NUCLEOTIDIQUE : COMPTAGES ET DISTRIBUTION RELATIVE  \n", Sep, t_data_bases, "\n")
+    
 elif args.flag :
-    print(Sep, "4. ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n", Sep, "différent commentaires possibles: \n",
-          "\u2022 A: Read apparié.\n",
-          "\u2022 B: Segments appariés correctement selon les critères de l'aligneur. \n",
-          "\u2022C: Segment particulier non aligné. \n",
-          "\u2022 D: Segment complémentaire non aligné sur le brin négatif. \n",
+    data = [(f"{cle}  |", f"{valeurs[0]} |", f"{valeurs[1]}  |") for cle, valeurs in d_flags.items()]
+    t_flags = pd.DataFrame(data, columns=["Flag    ", "Occurences       ", "Decodage"])
+
+    print(Sep, "3. ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n", Sep, "different commentaires possibles: \n",
+          "\u2022 A: Read apparie.\n",
+          "\u2022 B: Segments apparies correctement selon les critères de l'aligneur. \n",
+          "\u2022 C: Segment particulier non aligne. \n",
+          "\u2022 D: Segment complementaire non aligne sur le brin negatif. \n",
           "\u2022 E: Segment est reverse complement.\n",
           "\u2022 F: Segment complementaire est reverse complement.\n",
           "\u2022 G: Il s'agit du premier read d'une paire sur le brin positif (5'->3').\n",
-          "\u2022 H: Il s'agit du second read d'une paire sur le brin négatif (5' -> 3').\n",
-          "\u2022 I: Alignement secondaire (non spécifique, alignement multiple).\n",
-          "\u2022 J: Read qui n'a pas passé les filtres de qualité.\n",
+          "\u2022 H: Il s'agit du second read d'une paire sur le brin negatif (5' -> 3').\n",
+          "\u2022 I: Alignement secondaire (non specifique, alignement multiple).\n",
+          "\u2022 J: Read qui n'a pas passe les filtres de qualite.\n",
           "\u2022 K: Duplication due à la PCR ou au processus optique.\n",
-          "\u2022 L: Alignement supplémentaire (non spécifique, alignement multiple).\n", "\n", t_flags)
+          "\u2022 L: Alignement supplementaire (non specifique, alignement multiple).\n", "\n", t_flags)
 elif args.pos :
-    print(" ", Sep, "5. DISTRIBUTIONS DES READS PAR POSITIONS DE DEPART  \n", Sep, t_Data_pos, "\n")
+    print(" ", Sep, "4. DISTRIBUTIONS DES READS PAR POSITIONS DE DEPART  \n", Sep, t_Data_pos, "\n")
 elif args.ali :
-    print(Sep, "6. ANALYSE DE L'ALIGNEMENT  \n", Sep, "\n")
+    print(Sep, "5. ANALYSE DE L'ALIGNEMENT  \n", Sep, "\n")
 
     print("nombre de reads : ", len(d_sam), "\n")
     print("single read:", "\n")
 
-    print("\u2022 read mappés", "\n")
-    print("nombre de reads apparié correctement selon les critères de l'aligneur : ", read_aligné)
-    print("pourcentage de read correctement apparié : ", format((read_aligné / len(d_sam)) * 100, '.3f'), " %", "\n")
+    print("\u2022 read mappes", "\n")
+    print("nombre de reads apparie correctement selon les critères de l'aligneur : ", read_aligne)
+    print("pourcentage de read correctement apparie : ", format((read_aligne / len(d_sam)) * 100, '.3f'), " %", "\n")
 
-    print("\u2022 read non mappés", "\n")
-    print("nombre de reads non aligné : ", read_non_aligné)
-    print("pourcentage de read correctement apparié : ", format((read_non_aligné / len(d_sam)) * 100, '.3f'), " %",
+    print("\u2022 read non mappes", "\n")
+    print("nombre de reads non aligne : ", read_non_aligne)
+    print("pourcentage de read correctement apparie : ", format((read_non_aligne / len(d_sam)) * 100, '.3f'), " %",
           "\n")
     print("pair read", "\n")
     
-    print("\u2022 les paires de reads où un seul read de la paire est entierement mappé et l’autre non mappé", "\n")
-    print("nombre de read aligné avec la paire non aligné", read_aligné_paire_non)
-    print("pourcentage de read correctement apparié : ", format((read_aligné_paire_non / len(d_sam)) * 100, '.3f'),
+    print("\u2022 les paires de reads où un seul read de la paire est entierement mappe et l’autre non mappe", "\n")
+    print("nombre de read aligne avec la paire non aligne", read_aligne_paire_non)
+    print("pourcentage de read correctement apparie : ", format((read_aligne_paire_non / len(d_sam)) * 100, '.3f'),
           " %",
           "\n")
 
-    
 elif args.qual :
-    print(Sep, "7. ANALYSE DE LA QUALITÉ DE MAPPING\n", Sep, "\n", t_qual)
+    d_qual = analyse_qualite(d_sam)
 
+    data = [(f"{cle}  |", f"{valeurs} |") for cle, valeurs in d_qual.items()]
+    t_qual = pd.DataFrame(data, columns=["Qualite    ", "Occurences       "])
 
-
-
-
+    print(Sep, "6. ANALYSE DE LA QUALITe DE MAPPING\n", Sep, "\n", t_qual)
