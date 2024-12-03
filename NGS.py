@@ -211,11 +211,11 @@ args = parser.parse_args()
 
 # Define the conditional structure to perform all analyses if no arguments are provided. Otherwise, execute the requested analyses:
 
-if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual]):
+if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual, args.ali]):
     print("Rapport integrale de l'analyse du fichier SAM : \n")
    # __________________________________________________________________________________________________________________________________________________________________________________________________ #
     # preliminary analysis
-    print(Sep, "1. PRELIMINARY ANALYSIS  \n", Sep, "\n")
+    print(Sep, "PRELIMINARY ANALYSIS  \n", Sep, "\n")
 
     print("number of segments : ", len(d_sam), "\n")
     print("single read:", "\n")
@@ -245,7 +245,7 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual]):
     data_bases = [(f"{cle} |", f"{Val_SEQ[1]} |", f"{Val_SEQ[0]} |", f"{pourcentages[cle]:.2f} %") for cle, Val_SEQ in comptes.items()]
     t_data_bases = pd.DataFrame(data_bases, columns=["Motif       ", "Nom          ", "Occurences    ", "Valeur relative"])
 
-    print(" ", Sep, "2. NUCLEOTIDES ANALYSIS : Relative distribution of the nucleotides in the segments  \n", Sep, t_data_bases, "\n")
+    print(" ", Sep, "NUCLEOTIDES ANALYSIS : Relative distribution of the nucleotides in the segments  \n", Sep, t_data_bases, "\n")
     print("percentage of GC of all the segments : ",f"{pourcentages['C']+pourcentages['G']:.2f} %" )
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
     # Analysis of the CIGAR
@@ -266,7 +266,7 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual]):
     data = [(f"{cle}  |", f"{valeurs[0]} |", f"{valeurs[1]}  |") for cle, valeurs in d_flags.items()]
     t_flags = pd.DataFrame(data, columns=["Flag    ", "Occurences       ", "Decodage"])
 
-    print(Sep, "3. ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n", Sep, "different commentaires possibles: \n",
+    print(Sep, "ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n", Sep, "different commentaires possibles: \n",
           "\u2022 A: Read apparie.\n",
           "\u2022 B: Segments apparies correctement selon les critères de l'aligneur. \n",
           "\u2022 C: Segment particulier non aligne. \n",
@@ -288,7 +288,7 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual]):
     Data_pos = [(f"{cle}   |", f"{val}   |") for cle, val in d_posD.items()]
     t_Data_pos = pd.DataFrame(Data_pos, columns=["Position de depart", "Nombre de reads"])
 
-    print(" ", Sep, "4. DISTRIBUTIONS DES READS PAR POSITIONS DE DEPART  \n", Sep, t_Data_pos, "\n")
+    print(" ", Sep, "DISTRIBUTIONS DES READS PAR POSITIONS DE DEPART  \n", Sep, t_Data_pos, "\n")
     
 
    
@@ -299,7 +299,7 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual]):
 
     data = [(f"{cle}  |", f"{valeurs} |") for cle, valeurs in d_qual.items()]
     t_qual = pd.DataFrame(data, columns=["Qualite    ", "Occurences       "])
-    print(Sep, "6. ANALYSE DE LA QUALITe DE MAPPING\n", Sep, "\n",t_qual)
+    print(Sep, "ANALYSE DE LA QUALITe DE MAPPING\n", Sep, "\n",t_qual)
 
 elif args.cigar :
     # Analyze the CIGAR string :
@@ -311,7 +311,7 @@ elif args.cigar :
     t_Data_cigar = pd.DataFrame(Data_cigar,
                             columns=["Motif       ", "Nom            ", "Occurences          ", "Valeur relative"])
                             
-    print(" ", Sep, "1. ANALYSE DES CIGARS : COMPTAGES DES MOTIFS ET DISTRIBUTION RELATIVE \n", Sep, "\n", t_Data_cigar,
+    print(" ", Sep, "ANALYSE DES CIGARS : COMPTAGES DES MOTIFS ET DISTRIBUTION RELATIVE \n", Sep, "\n", t_Data_cigar,
           "\n" )
 elif args.base :
     # Call the analyse_SEQ function
@@ -321,15 +321,15 @@ elif args.base :
     data_bases = [(f"{cle} |", f"{Val_SEQ[1]} |", f"{Val_SEQ[0]} |", f"{pourcentages[cle]:.2f} %") for cle, Val_SEQ in comptes.items()]
     t_data_bases = pd.DataFrame(data_bases, columns=["Motif       ", "Nom          ", "Occurences    ", "Valeur relative"])
 
-    print(" ", Sep, "2. NUCLEOTIDES ANALYSIS : Relative distribution of the nucleotides in the segments  \n", Sep, t_data_bases, "\n")
+    print(" ", Sep, "NUCLEOTIDES ANALYSIS : Relative distribution of the nucleotides in the segments  \n", Sep, t_data_bases, "\n")
     print("percentage of GC of all the segments : ",f"{pourcentages['C']+pourcentages['G']:.2f} %" )
-   
-    
+
+
 elif args.flag :
     data = [(f"{cle}  |", f"{valeurs[0]} |", f"{valeurs[1]}  |") for cle, valeurs in d_flags.items()]
     t_flags = pd.DataFrame(data, columns=["Flag    ", "Occurences       ", "Decodage"])
 
-    print(Sep, "3. ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n", Sep, "different commentaires possibles: \n",
+    print(Sep, "ANALYSE DES FLAGS : OCCURENCES ET TRADUCTION \n", Sep, "different commentaires possibles: \n",
           "\u2022 A: Read apparie.\n",
           "\u2022 B: Segments apparies correctement selon les critères de l'aligneur. \n",
           "\u2022 C: Segment particulier non aligne. \n",
@@ -343,9 +343,16 @@ elif args.flag :
           "\u2022 K: Duplication due à la PCR ou au processus optique.\n",
           "\u2022 L: Alignement supplementaire (non specifique, alignement multiple).\n", "\n", t_flags)
 elif args.pos :
-    print(" ", Sep, "4. DISTRIBUTIONS DES READS PAR POSITIONS DE DEPART  \n", Sep, t_Data_pos, "\n")
+    print(f"nombre de positions : {len(analyse_Dpos(d_sam))}")
+
+    d_posD = analyse_Dpos(d_sam)
+
+    Data_pos = [(f"{cle}   |", f"{val}   |") for cle, val in d_posD.items()]
+    t_Data_pos = pd.DataFrame(Data_pos, columns=["Position de depart", "Nombre de reads"])
+
+    print(" ", Sep, "DISTRIBUTIONS DES READS PAR POSITIONS DE DEPART  \n", Sep, t_Data_pos, "\n")
 elif args.ali :
-    print(Sep, "1. PRELIMINARY ANALYSIS  \n", Sep, "\n")
+    print(Sep, "PRELIMINARY ANALYSIS  \n", Sep, "\n")
 
     print("number of segments : ", len(d_sam), "\n")
     print("single read:", "\n")
@@ -373,4 +380,4 @@ elif args.qual :
     data = [(f"{cle}  |", f"{valeurs} |") for cle, valeurs in d_qual.items()]
     t_qual = pd.DataFrame(data, columns=["Qualite    ", "Occurences       "])
 
-    print(Sep, "6. ANALYSE DE LA QUALITe DE MAPPING\n", Sep, "\n", t_qual)
+    print(Sep, "ANALYSE DE LA QUALITe DE MAPPING\n", Sep, "\n", t_qual)
