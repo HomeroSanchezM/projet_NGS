@@ -50,7 +50,7 @@ else
         echo "Erreur lors de l'extraction des flags et du comptage des occurrences, faire une vérification du nom et du contenu du script python"
         exit 1
     else 
-        echo -e "\nExtractions des Flags et comptages des occurrences effectués avec succès\n"
+        echo -e "\nAnalyse effectuée avec succès\n"
     fi
     
     echo -e "\n$sep"
