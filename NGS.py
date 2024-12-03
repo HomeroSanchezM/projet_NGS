@@ -2,6 +2,7 @@ import sys
 import pandas as pd 
 import re 
 import argparse 
+import termplotlib as tpl
 
 fichier_sam = sys.argv[1]
 Sep = ("-" * 70) + "\n"
@@ -295,12 +296,31 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual, a
    
 
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
-    #Analysis of the quality
+    # Analyse de la qualité
     d_qual = analyse_qualite(d_sam)
-
-    data = [(f"{cle}  |", f"{valeurs} |") for cle, valeurs in d_qual.items()]
-    t_qual = pd.DataFrame(data, columns=["Qualite    ", "Occurences       "])
-    print(Sep, "ANALISYS OF THE QUALITY OF THE ALIGNMENT\n", Sep, "\n",t_qual)
+    
+    # Récupération des scores et occurrences
+    scores = list(d_qual.keys())
+    occurrences = list(d_qual.values())
+    
+    # Définir les paramètres pour les barres ASCII
+    max_occ = max(occurrences)
+    bar_width = 40  # Largeur des barres ASCII
+    
+    # Préparation des données pour le DataFrame avec bar_length
+    data = []
+    for score, occ in zip(scores, occurrences):
+    	bar_length = int((occ / max_occ) * bar_width)
+    	bar_ascii = ('█' * bar_length).rjust(bar_width)
+    	note = "Low" if int(score) < 30 else ""  # Définir une note pour les scores médiocres (< 30)
+    	data.append((f"{score}  |", f"{occ}    |", f"   {note} |", f"{bar_ascii} |"))
+    
+    # Création du DataFrame
+    t_qual = pd.DataFrame(data, columns=["Qualite    ", "Occurences     ", "Score < 30","Distribution               "])
+    
+    # Affichage de la table
+    Sep = '-' * 90
+    print(Sep, "\n                       ANALYSIS OF THE QUALITY ALIGNMENT\n", Sep, "\n", t_qual)
 
 elif args.cigar :
     # Analyze the CIGAR string :
@@ -350,6 +370,7 @@ elif args.pos :
 
     Data_pos = [(f"{cle}   |", f"{val}   |") for cle, val in d_posD.items()]
     t_Data_pos = pd.DataFrame(Data_pos, columns=["Position de depart", "Nombre de reads"])
+    
 
     print(" ", Sep, "START POSITION OF SEGMENT ALIGNED   \n", Sep, t_Data_pos, "\n")
 elif args.ali :
@@ -376,9 +397,29 @@ elif args.ali :
     #      "\n")
 
 elif args.qual :
+    # Analyse de la qualité
     d_qual = analyse_qualite(d_sam)
+    
+    # Récupération des scores et occurrences
+    scores = list(d_qual.keys())
+    occurrences = list(d_qual.values())
+    
+    # Définir les paramètres pour les barres ASCII
+    max_occ = max(occurrences)
+    bar_width = 40  # Largeur des barres ASCII
+    
+    # Préparation des données pour le DataFrame avec bar_length
+    data = []
+    for score, occ in zip(scores, occurrences):
+    	bar_length = int((occ / max_occ) * bar_width)
+    	bar_ascii = ('█' * bar_length).rjust(bar_width)
+    	note = "Low" if int(score) < 30 else ""  # Définir une note pour les scores médiocres (< 30)
+    	data.append((f"{score}  |", f"{occ}    |", f"   {note} |", f"{bar_ascii} |"))
+    
+    # Création du DataFrame
+    t_qual = pd.DataFrame(data, columns=["Qualite    ", "Occurences     ", "Score < 30","Distribution               "])
+    
+    # Affichage de la table
+    Sep = '-' * 90
+    print(Sep, "\nANALYSIS OF THE QUALITY ALIGNMENT\n", Sep, "\n", t_qual)
 
-    data = [(f"{cle}  |", f"{valeurs} |") for cle, valeurs in d_qual.items()]
-    t_qual = pd.DataFrame(data, columns=["Qualite    ", "Occurences       "])
-
-    print(Sep, "ANALISYS OF THE QUALITY OF THE ALIGNMENT\n", Sep, "\n", t_qual)
