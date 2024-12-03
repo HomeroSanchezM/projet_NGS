@@ -58,7 +58,7 @@ pip install -r requirements.txt
 
 The project is adapted for the analisis of SAM files containing aligned DNA sequence reads. During the execution, the SAM file is the only Imput needed and have to be add to the same folder that contain the project's files. For more information ot the SAM format, please read the documentation **descriptive_sam.pdf** of the project. 
 
-## Script execution
+## How to use? 
 
 ### Complete execution
 
@@ -76,9 +76,9 @@ The program have differents options that allow the user to only extract the info
 - **--cigar** : analysis of the cigar information 
 - **--base** : percentage of different bases
 - **--flag** : analysis of the flags
-- **--pos** : 
-- **--ali** :
-- **--qual** : 
+- **--pos** : analysis of the position of the fisrt AA
+- **--ali** : Sequence of the alignement
+- **--qual** : quality of the mapping
 
 
 the list of options is avalable with the folowing line of code: 
@@ -90,4 +90,6 @@ the list of options is avalable with the folowing line of code:
 
 The execution of the program will print in the terminal tables that give a summary vieuw of the analysis.
 
+
+Licence GPLv3
 
