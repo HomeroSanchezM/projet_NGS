@@ -13,7 +13,7 @@
     1. [Import of the project](#1-Import-of-the-project)
     2. [installation of outbuildings with `requirements.txt`](#2-Instalation-of-outbuildings-with-requirement.txt)
     3. [Type of the input](#2-Type-of-the-imput)
-4. [Script execution](#Script-execution)
+4. [How to use the Script?](#how-to-use-the-script)
     1. [Complete execution](#1-Complete-execution)
     2. [Execution with options](#2-Execution-with-options)
 5. [Output](#structure-des-fichiers)
@@ -58,7 +58,7 @@ pip install -r requirements.txt
 
 The project is adapted for the analisis of SAM files containing aligned DNA sequence reads. During the execution, the SAM file is the only Imput needed and have to be add to the same folder that contain the project's files. For more information ot the SAM format, please read the documentation **descriptive_sam.pdf** of the project. 
 
-## How to use? 
+## How to use the script? 
 
 ### Complete execution
 
@@ -66,7 +66,8 @@ Here you have an example of execution using a SAM file present in the project fi
 
 ```
 ./main.sh mapping.sam
-``` 
+```
+this execution will analyse and print by default a complete analysis of the your SAM file, if you're only interested in doing a partial analysis, you can options.  
 
 ### execution with options
 
@@ -80,13 +81,13 @@ The program have differents options that allow the user to only extract the info
 - **--ali** : Sequence of the alignement
 - **--qual** : quality of the mapping
 
-
 the list of options is avalable with the folowing line of code: 
 
 ```
 ./main.sh mapping.sam --help
 ```
 ## Output 
+
 
 The execution of the program will print in the terminal tables that give a summary vieuw of the analysis.
 
