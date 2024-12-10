@@ -2,13 +2,12 @@ import sys
 import pandas as pd 
 import re 
 import argparse 
-import termplotlib as tpl
-
+import math
 fichier_sam = sys.argv[1]
 Sep = ("-" * 70) + "\n"
 
 # __________________________________________________________________________________________________________________________________________________________________________________________________________#
-#                                               CREATION OF THE MAIN DICTIONARY BY ITERATIVE STRUCTURE FOR                                                                              #
+#                                                                1. CREATION OF THE MAIN DICTIONARY BY ITERATIVE STRUCTURE FOR                                                                              #
 # __________________________________________________________________________________________________________________________________________________________________________________________________________#
 
 # The dico_extraction1 function takes as input a character string corresponding to the path of a SAM file and returns a dictionary in the form of DICOEXTRACTION1.
@@ -50,7 +49,7 @@ def dico_extraction1(fichier_sam):
 d_sam = dico_extraction1(fichier_sam)   # To call function dico_extraction1 for get the dictionnary d_sam
 
 # __________________________________________________________________________________________________________________________________________________________________________________________________________#
-#                                                 CIGARs TREATMENT : extract the absolute values and calculate sum and relative's values                                                              #
+#                                                    2. CIGARs TREATMENT : extract the absolute values and calculate sum and relative's values                                                              #
 # __________________________________________________________________________________________________________________________________________________________________________________________________________#
 def analyse_CIGAR(d_sam):
     comptes_CIGAR = {
@@ -78,7 +77,7 @@ def analyse_CIGAR(d_sam):
     return comptes_CIGAR
     
 # __________________________________________________________________________________________________________________________________________________________________________________________________________#
-#                                                 Relative distribution of the nucleotides in the sequences                                         
+#                                                                        3. Relative distribution of the nucleotides in the sequences                                         
 # __________________________________________________________________________________________________________________________________________________________________________________________________________#
 
 def analyse_SEQ(d_sam):
@@ -98,8 +97,7 @@ def analyse_SEQ(d_sam):
     }
 
     return comptes_base, PRCT_BASES, total_BASE
-# _______________________________________________________________________________________________________________________________________________________________________ #
-#                                                 FLAG ANALYSIS : Translation and occurences    
+
 # __________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                          4. Treatments FLAGs : translate and relative distribution                                                                   #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
 
 def decodage_flags(flag_value):
@@ -154,9 +152,8 @@ for i_flag in d_flags:
 # Convert the dictionnary into a list of tuples [(Key, value1, value2), ...]
 data = [(f"{cle}  |", f"{valeurs[0]} |", f"{valeurs[1]}  |") for cle, valeurs in d_flags.items()]
 t_flags = pd.DataFrame(data, columns=["Flag    ", "Occurences       ", "Decodage"])
-# _________________________________________________________________________________________________________________________________________________________________________________________________________
-#                                                             START POSITION OF SEGMENT ALIGNED 
-# _________________________________________________________________________________________________________________________________________________________________________________________________________
+
+# __________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                                     5 CHROMOSOMAL POSITION PROCESSING:                                                                                   #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
 def analyse_Dpos(d_pos):
     d_posD = {}
     for read in d_pos.values():
@@ -167,6 +164,7 @@ def analyse_Dpos(d_pos):
             d_posD[POS] = 1
 
     return d_posD
+# __________________________________________________________________________________________________________________________________________________________________________________________________________# #                                                                                       6 ALIGNEMENT ANALISYS                                                                                              #	#__________________________________________________________________________________________________________________________________________________________________________________________________________#
 
 # Provide the percentage of correctly paired reads
 read_aligne = 0
@@ -183,7 +181,7 @@ for i_flag in d_flags:
         read_aligne_paire_non += d_flags[i_flag][0]
 
 # __________________________________________________________________________________________________________________________________________________________________________________________________________#
-#                                                                   MAPPING QUALITY ANALYSIS                                                                                    #
+#                                                                                7.  MAPPING QUALITY ANALYSIS                                                                                    #
 # __________________________________________________________________________________________________________________________________________________________________________________________________________# 
 def analyse_qualite(d_sam):
     d_qual = {}
@@ -197,7 +195,7 @@ def analyse_qualite(d_sam):
     return d_qual
 
 # __________________________________________________________________________________________________________________________________________________________________________________________________ #
-#                                                    DEFINITIONS OF OPTIONS TO BE PASSED AS PARAMETERS TO THE MAIN SHELL SCRIPT > $1 AND SCHEDULING                                                #
+#                                                    8. DEFINITIONS OF OPTIONS TO BE PASSED AS PARAMETERS TO THE MAIN SHELL SCRIPT > $1 AND SCHEDULING                                                #
 # __________________________________________________________________________________________________________________________________________________________________________________________________ #
 
 parser = argparse.ArgumentParser(description="Analysis of SAM files.")
@@ -262,7 +260,8 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual, a
                             
     print(" ", Sep, "CIGARS ANALYSIS : Patern counts and relative distribution \n", Sep, "\n", t_Data_cigar, "\n")
 	
-    #______________________________________________________________________________________________________________________________________________________________________ #
+   
+    # __________________________________________________________________________________________________________________________________________________________________________________________________ #
     # Analysis of the flags
     data = [(f"{cle}  |", f"{valeurs[0]} |", f"{valeurs[1]}  |") for cle, valeurs in d_flags.items()]
     t_flags = pd.DataFrame(data, columns=["Flag    ", "Occurences       ", "Decodage"])
@@ -296,7 +295,8 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual, a
    
 
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
-    # Analyse de la qualité
+
+    # Exemple d'analyse de qualité (ajustez selon votre logique)
     d_qual = analyse_qualite(d_sam)
     
     # Récupération des scores et occurrences
@@ -306,17 +306,23 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual, a
     # Définir les paramètres pour les barres ASCII
     max_occ = max(occurrences)
     bar_width = 40  # Largeur des barres ASCII
-    
     # Préparation des données pour le DataFrame avec bar_length
     data = []
+    
     for score, occ in zip(scores, occurrences):
-    	bar_length = int((occ / max_occ) * bar_width)
+    	bar_length = int((math.log10(max(occ, 1)) / math.log10(max_occ)) * bar_width)
     	bar_ascii = ('█' * bar_length).rjust(bar_width)
     	note = "Low" if int(score) < 30 else ""  # Définir une note pour les scores médiocres (< 30)
-    	data.append((f"{score}  |", f"{occ}    |", f"   {note} |", f"{bar_ascii} |"))
-    
+    	data.append((f"{score}   |",f"{occ}   |", f"{note}     |", f"{bar_ascii}"))  # Ajout des valeurs sans espaces supplémentaires
+    	
     # Création du DataFrame
-    t_qual = pd.DataFrame(data, columns=["Qualite    ", "Occurences     ", "Score < 30","Distribution               "])
+    t_qual = pd.DataFrame(data, columns=["Qualite", "Occurences", "Score < 30", "Distribution logarithmique (Base 10)"])
+    
+    # Assurez-vous que la colonne "Qualite" est de type entier pour trier correctement les scores
+    t_qual["Qualite"] = t_qual["Qualite"].apply(lambda x: int(x.split()[0])) 
+    
+    # Tri par le nombre d'occurrences
+    t_qual = t_qual.sort_values(by="Qualite", ascending=False)
     
     # Affichage de la table
     Sep = '-' * 90
@@ -411,13 +417,15 @@ elif args.qual :
     # Préparation des données pour le DataFrame avec bar_length
     data = []
     for score, occ in zip(scores, occurrences):
-    	bar_length = int((occ / max_occ) * bar_width)
+    	bar_length = int((math.log10(occ) / math.log10(max_occ)) * bar_width)
     	bar_ascii = ('█' * bar_length).rjust(bar_width)
     	note = "Low" if int(score) < 30 else ""  # Définir une note pour les scores médiocres (< 30)
-    	data.append((f"{score}  |", f"{occ}    |", f"   {note} |", f"{bar_ascii} |"))
+    	data.append((score, occ, note, bar_ascii))
     
     # Création du DataFrame
-    t_qual = pd.DataFrame(data, columns=["Qualite    ", "Occurences     ", "Score < 30","Distribution               "])
+    t_qual = pd.DataFrame(data, columns=["Qualite", "Occurences     ", "Score < 30","   Distribution logarithmique (Base 10)        "])
+    # Trier la DataFrame par la colonne "Occurences     " en ordre décroissant
+    t_qual = t_qual.sort_values(by="Occurences     ", ascending=False)
     
     # Affichage de la table
     Sep = '-' * 90
