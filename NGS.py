@@ -290,41 +290,36 @@ if args.all or not any([args.cigar, args.base, args.flag, args.pos, args.qual, a
     t_Data_pos = pd.DataFrame(Data_pos, columns=["Position de depart", "Nombre de reads"])
 
     print(" ", Sep, "START POSITION OF SEGMENT ALIGNED  \n", Sep, t_Data_pos, "\n")
-    
-
    
-
     # __________________________________________________________________________________________________________________________________________________________________________________________________ #
 
-    # Exemple d'analyse de qualité (ajustez selon votre logique)
+     # Example of quality analysis (adjust according to your logic)
     d_qual = analyse_qualite(d_sam)
     
-    # Récupération des scores et occurrences
+    # Retrieving scores and hits
     scores = list(d_qual.keys())
     occurrences = list(d_qual.values())
     
-    # Définir les paramètres pour les barres ASCII
+    # Set parameters for ASCII bars
     max_occ = max(occurrences)
-    bar_width = 40  # Largeur des barres ASCII
-    # Préparation des données pour le DataFrame avec bar_length
+    bar_width = 40  # ASCII bar width
+    # Preparing data for the DataFrame with bar_length
     data = []
     
     for score, occ in zip(scores, occurrences):
     	bar_length = int((math.log10(max(occ, 1)) / math.log10(max_occ)) * bar_width)
     	bar_ascii = ('█' * bar_length).rjust(bar_width)
-    	note = "Low" if int(score) < 30 else ""  # Définir une note pour les scores médiocres (< 30)
-    	data.append((f"{score}   |",f"{occ}   |", f"{note}     |", f"{bar_ascii}"))  # Ajout des valeurs sans espaces supplémentaires
+    	note = "Low" if int(score) < 30 else "" # Set a score for low scores (< 30)
+    	data.append((f"{score}   |",f"{occ}   |", f"{note}     |", f"{bar_ascii}"))  # Add values without extra spaces
     	
-    # Création du DataFrame
+    # DataFrame creation
     t_qual = pd.DataFrame(data, columns=["Qualite", "Occurences", "Score < 30", "Distribution logarithmique (Base 10)"])
-    
-    # Assurez-vous que la colonne "Qualite" est de type entier pour trier correctement les scores
     t_qual["Qualite"] = t_qual["Qualite"].apply(lambda x: int(x.split()[0])) 
     
-    # Tri par le nombre d'occurrences
+     # Sort by number of hits
     t_qual = t_qual.sort_values(by="Qualite", ascending=False)
     
-    # Affichage de la table
+     # Table display
     Sep = '-' * 90
     print(Sep, "\n                       ANALYSIS OF THE QUALITY ALIGNMENT\n", Sep, "\n", t_qual)
 
@@ -393,41 +388,30 @@ elif args.ali :
     print("number of segment unmapped : ", read_non_aligne)
     print("percentagz of segments unmapped : ", format((read_non_aligne / len(d_sam)) * 100, '.3f'), " %",
           "\n")
-    
-    #print("pair read", "\n")
-    
-    #print("\u2022 les paires de reads où un seul read de la paire est entierement mappe et l’autre non mappe", "\n")
-    #print("nombre de read aligne avec la paire non aligne", read_aligne_paire_non)
-    #print("pourcentage de read correctement apparie : ", format((read_aligne_paire_non / len(d_sam)) * 100, '.3f'),
-    #      " %",
-    #      "\n")
 
 elif args.qual :
-    # Analyse de la qualité
     d_qual = analyse_qualite(d_sam)
-    
-    # Récupération des scores et occurrences
     scores = list(d_qual.keys())
     occurrences = list(d_qual.values())
-    
-    # Définir les paramètres pour les barres ASCII
+   
     max_occ = max(occurrences)
-    bar_width = 40  # Largeur des barres ASCII
+    bar_width = 40
     
-    # Préparation des données pour le DataFrame avec bar_length
     data = []
+    
     for score, occ in zip(scores, occurrences):
-    	bar_length = int((math.log10(occ) / math.log10(max_occ)) * bar_width)
+    	bar_length = int((math.log10(max(occ, 1)) / math.log10(max_occ)) * bar_width)
     	bar_ascii = ('█' * bar_length).rjust(bar_width)
-    	note = "Low" if int(score) < 30 else ""  # Définir une note pour les scores médiocres (< 30)
-    	data.append((score, occ, note, bar_ascii))
+    	note = "Low" if int(score) < 30 else ""  
+    	data.append((f"{score}   |",f"{occ}   |", f"{note}     |", f"{bar_ascii}")) 
+    	
+    t_qual = pd.DataFrame(data, columns=["Qualite", "Occurences", "Score < 30", "Distribution logarithmique (Base 10)"])
     
-    # Création du DataFrame
-    t_qual = pd.DataFrame(data, columns=["Qualite", "Occurences     ", "Score < 30","   Distribution logarithmique (Base 10)        "])
-    # Trier la DataFrame par la colonne "Occurences     " en ordre décroissant
-    t_qual = t_qual.sort_values(by="Occurences     ", ascending=False)
+    t_qual["Qualite"] = t_qual["Qualite"].apply(lambda x: int(x.split()[0])) 
+
+    t_qual = t_qual.sort_values(by="Qualite", ascending=False)
     
-    # Affichage de la table
     Sep = '-' * 90
-    print(Sep, "\nANALYSIS OF THE QUALITY ALIGNMENT\n", Sep, "\n", t_qual)
+    print(Sep, "\n                       ANALYSIS OF THE QUALITY ALIGNMENT\n", Sep, "\n", t_qual)
+
 
